@@ -10,7 +10,7 @@ import ResponsiveAppBar from "../../Organisms/NavBar";
 import { Avatar, Container, Grid, Link, styled } from "@mui/material";
 import TaehoImage from "../../../Assets/Images/taeho.jpg";
 import WenzhanImage from "../../../Assets/Images/wenzhan.jpg";
-import ShowkotImage from "../../../Assets/Images/showkkot.jpg";
+import ShowkotImage from "../../../Assets/Images/showkot.jpg";
 import GustavoImage from "../../../Assets/Images/gustavo.jpg";
 import HaijanImage from "../../../Assets/Images/HaijanPhoto.jpg";
 import JakeImage from "../../../Assets/Images/jake.jpg";
