@@ -10,7 +10,7 @@ import ResponsiveAppBar from "../../Organisms/NavBar";
 import { Avatar, Container, Grid, Link, styled } from "@mui/material";
 import TaehoImage from "../../../Assets/Images/taeho.jpg";
 import WenzhanImage from "../../../Assets/Images/wenzhan.jpg";
-import ShankhaImage from "../../../Assets/Images/shankha.jpg";
+import ShowkotImage from "../../../Assets/Images/showkkot.jpg";
 import GustavoImage from "../../../Assets/Images/gustavo.jpg";
 import HaijanImage from "../../../Assets/Images/HaijanPhoto.jpg";
 import JakeImage from "../../../Assets/Images/jake.jpg";
@@ -28,12 +28,12 @@ const teamMembers = [
     profileUrl: "https://www.linkedin.com/in/gustavoaniceto/",
   },
   {
-    name: "Shankha Shubhra Mukherjee",
+    name: "Showkot Hossain",
     role: "Lead Developer",
     university: "University of Notre Dame",
-    imgUrl: ShankhaImage,
+    imgUrl: ShowkotImage,
     profileUrl:
-      "https://www.linkedin.com/in/shankha-shubhra-mukherjee-3aba88198/",
+      "https://www.linkedin.com/in/showkoth/",
   },
   {
     name: "Jake Chandler",
@@ -345,8 +345,7 @@ const LandingPage: React.FC = () => {
             Affiliations
           </Typography>
           <Typography variant="h6" gutterBottom sx={{ mb: 4 }}>
-            This project is sponsored by NSF under Grant No. OAC-2312973 and
-            Cascarilla Blockchain Endowment Fund.
+          This project is sponsored by NSF under Grant No. OAC-2312973 & OAC-2312974 and Cascarilla Blockchain Endowment Fund.
             {/* Placeholder for NSF logo */}
           </Typography>
           <Box sx={{ textAlign: "center", mt: 4 }}>
