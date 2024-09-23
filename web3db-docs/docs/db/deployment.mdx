@@ -21,52 +21,42 @@ Before proceeding with the deployment, ensure that you have the following prereq
 
 ## Deployment Steps
 
-1. Clone the QueryAPIKernel repository by running the following command:
+1. Clone the web3db-backend repository by running the following command:
 
    ```bash
-   git clone https://github.com/gpradofe/web3db-backend.git
+   git clone https://github.com/showkoth/web3db-backend.git
    ```
 
-   Alternatively, you can download the source code directly from the repository's [GitHub page](https://github.com/your-repo-url).
+   Alternatively, you can download the source code directly from the repository's [GitHub page](https://github.com/showkoth/web3db-backend.git).
 
-2. Navigate to the root directory of the cloned/downloaded repository.
+2. Navigate to the DB directory where the docker-compose file locates.
 
    ```bash
-   cd QueryAPI/QueryAPIKernel
+   cd web3db-backend/DB/
 
    ```
 
-3. Verify that the `docker-compose.yml` file exists in the root directory. This file contains the configuration for all the necessary services.
+3. Verify that the `docker-compose.yml` file exists in the root directory (web3db-backend/DB/). This file contains the configuration for all the necessary services.
 
-4. Open a terminal and navigate to the root directory of the repository.
-
-5. Run the following command to start the containers:
+4. Run the following command to start the containers:
 
    ```bash
-   docker-compose up -d
+   sudo docker-compose up -d
    ```
 
    This command will build and start all the containers defined in the `docker-compose.yml` file.
 
-6. Wait for the containers to start up. You can check the status of the containers using the following command:
+5. Wait for the containers to start up. You can check the status of the containers using the following command:
 
    ```bash
-   docker-compose ps
+   sudo docker-compose ps
    ```
 
    Ensure that all the containers are in the "Up" state before proceeding.
 
-7. Initialize the Hive server by executing the following commands:
-
-   ```bash
-   docker exec -it hive-server bash ./hiveserver2
-   ```
-
-   This will start the Hive server within the `hive-server` container.
-
 <Admonition type="success">
   Congratulations! You have successfully deployed the main database components
-  of the QueryAPIKernel solution using Docker Compose. The Apache Spark, Apache
+  of web3db using Docker Compose. The Apache Spark, Apache
   Hive, IPFS, and other services are now up and running.
 </Admonition>
 
@@ -80,9 +70,11 @@ To verify that the deployment is successful and the nodes are running properly, 
 
 3. Access the Apache Hive Web UI by opening a web browser and navigating to `http://localhost:10002`. You should see the Hive Web UI.
 
-4. Run a sample Spark job to ensure that Spark is functioning correctly. You can use the Spark shell or submit a Spark application.
+4. Access the Apache Hive NameNode UI by opening a web browser and navigating to `http://localhost:9870`. You should see the Hive DataNode UI.
 
-5. Execute a sample Hive query to verify that Hive is working as expected. You can use the Hive CLI or connect to Hive using a Hive client.
+5. Run a sample Spark job to ensure that Spark is functioning correctly. You can use the Spark shell or submit a Spark application.
+
+6. Execute a sample Hive query to verify that Hive is working as expected. You can use the Hive CLI or connect to Hive using a Hive client.
 
 If you encounter any issues during the deployment or while verifying the nodes, refer to the Troubleshooting section below.
 
