@@ -1,0 +1,170 @@
+---
+slug: /Tutorial/spark-cluster
+sidebar_position: 11
+---
+
+import Admonition from "@theme/Admonition";
+import CodeBlock from "@theme/CodeBlock";
+
+# Spark Cluster Setup
+
+Now that the Ngrok services are up and running, the master node is exposed to the public internet. This setup allows Spark worker nodes to join the cluster from any network, whether private or public.
+
+This guide provides step-by-step instructions for setting up the Spark master and worker nodes using Docker or Docker Compose.
+
+## **Prerequisites**
+
+Before proceeding, ensure that your system meets the following requirements:
+
+- **Docker**: [Install Docker](https://docs.docker.com/get-docker/)
+- **Docker Compose**: [Install Docker Compose](https://docs.docker.com/compose/install/)
+- **Ngrok**: Ensure Ngrok is installed and configured with an authentication token. Refer to the [Ngrok Setup Guide](../Tutorial/ngrok-setup) if needed.
+- **Network Access**: Ensure that your system has internet access to communicate with the Ngrok tunnel.
+
+---
+
+## **Master Node Setup**
+
+You can set up the Spark master node using either Docker or Docker Compose.
+
+### **Using Docker**
+
+First, create a Docker network for Spark:
+
+```bash
+docker network create spark-network
+```
+
+Then, run the Spark master node:
+
+```bash
+docker run -d --name spark-master \
+  --network spark-network \
+  -p 8080:8080 -p 7077:7077 \
+  -e SPARK_MODE=master \
+  -e SPARK_MASTER_PORT=7077 \
+  -e SPARK_MASTER_WEBUI_PORT=8080 \
+  bitnami/spark:latest
+```
+
+- **Ports**:
+  - `8080`: Spark master web UI port.
+  - `7077`: Spark master communication port.
+
+---
+
+### **Using Docker Compose**
+
+Below is a `docker-compose.yaml` file to set up the Spark master node:
+
+```yaml
+version: '3.8'
+
+services:
+  spark-master:
+    image: bitnami/spark:latest
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_PORT=7077
+      - SPARK_MASTER_WEBUI_PORT=8080
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    networks:
+      - spark-network
+
+networks:
+  spark-network:
+    driver: bridge
+```
+
+To start the Spark master node using Docker Compose, run:
+
+```bash
+docker-compose up -d
+```
+
+---
+
+## **Worker Node Setup**
+
+The worker node connects to the master node via the Ngrok tunnel URL. You can set up the worker node using Docker or Docker Compose.
+
+### **Using Docker**
+
+Run the Spark worker node using the following command. Replace `2.tcp.ngrok.io:14327` with your actual Ngrok TCP tunnel URL for the master node.
+
+```bash
+docker run -d --network host \
+    -e SPARK_WORKER_CORES=1 \
+    -e SPARK_WORKER_MEMORY=1G \
+    --name spark-worker \
+    bitnami/spark:latest /opt/bitnami/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://2.tcp.ngrok.io:14327
+```
+
+- **Environment Variables**:
+  - `SPARK_WORKER_CORES`: Number of CPU cores allocated to the worker.
+  - `SPARK_WORKER_MEMORY`: Amount of memory allocated to the worker.
+
+---
+
+### **Using Docker Compose**
+
+Below is a `docker-compose.yaml` configuration to set up the Spark worker node. Replace `${SPARK_MASTER_URL}` with your actual Ngrok TCP tunnel URL for the master node.
+
+```yaml
+version: '3.8'
+
+services:
+  spark-worker:
+    image: bitnami/spark:latest
+    environment:
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_MASTER_URL=${SPARK_MASTER_URL}
+    networks:
+      - spark-network
+    command: >
+      /opt/bitnami/spark/bin/spark-class org.apache.spark.deploy.worker.Worker ${SPARK_MASTER_URL}
+
+networks:
+  spark-network:
+    driver: bridge
+```
+
+Create a `.env` file to define the `SPARK_MASTER_URL` environment variable:
+
+```env
+SPARK_MASTER_URL=spark://2.tcp.ngrok.io:14327
+```
+
+To start the Spark worker node using Docker Compose, run:
+
+```bash
+docker-compose up -d
+```
+
+---
+
+## **Monitoring the Spark Cluster**
+
+Once both the master and worker nodes are running, you can monitor the cluster using the Spark master web UI:
+
+- **Spark Master Web UI**: [http://localhost:8080](http://localhost:8080)
+
+The Spark master web UI provides an overview of active worker nodes, running jobs, and resource usage.
+
+---
+
+## **Best Practices**
+
+- **Ngrok Tunnel**: Ensure that the Ngrok tunnel remains active for the worker nodes to maintain their connection with the master node.
+- **Environment Configuration**: Use Docker Compose with an `.env` file to simplify the management of environment-specific variables.
+- **Monitoring**: Regularly check the Spark master web UI to monitor cluster health and ensure worker nodes are properly connected.
+
+---
+
+For additional support or documentation:
+- [Ngrok Documentation](https://ngrok.com/docs)
+- [Apache Spark Documentation](https://spark.apache.org/docs/latest/)
+- [Bitnami Spark Docker Image](https://hub.docker.com/r/bitnami/spark)

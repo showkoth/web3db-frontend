@@ -1,0 +1,193 @@
+---
+slug: /Access Control/Smart Contract/Deployment
+sidebar_position: 8
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import Admonition from "@theme/Admonition";
+
+# Deployment
+
+## Deploying Smart Contracts
+
+This guide will walk you through the process of deploying the smart contract of web3db. For development purpose, we are deploying the smart contract in Sepolia Ethereum test network. 
+
+## Prerequisites
+
+Before proceeding with the deployment, ensure that you have the following prerequisites installed on your system:
+
+- **Node.js** (version 18.0.0 or higher)
+- **npm** (Node Package Manager):   Install [Node.js](https://nodejs.org/en/download/) (which includes npm) to run JavaScript/TypeScript-based tools and packages.
+- **Hardhat**: A development environment for compiling, deploying, and testing smart contracts. Install it globally or locally within your project:
+  ```bash
+  npm install --save-dev hardhat
+  ```
+- **Git**: Required to clone the repository or download source code.
+
+
+- **Metamask**: An Ethereum wallet with some Sepolia ETH (you can get test ETH from Sepolia faucets). Create a Metamask wallet and then you can obtain test ETH for Sepolia from various faucets (e.g., https://sepolia-faucet.pk910.de/#/) so you can pay for gas fees during deployment and transaction. Paste your Metamask wallet address in their website and start mining. Some test Ethereum (sepETH) will automatically be transferred to your account.
+- **Infura** account for API access
+- **Etherscan** account for exploring contract and verification
+
+## Deployment Steps
+
+1. Clone the web3db-backend repository by running the following command:
+    ```bash
+    git clone https://github.com/showkoth/web3db-backend.git
+    ```
+    
+    Alternatively, you can download the source code directly from the repository's [GitHub page](https://github.com/showkoth/web3db-backend.git).
+
+2. Navigate to the DB directory where the docker-compose file locates.
+    ```bash
+    cd web3db-backend/contracts/
+    ```
+   
+    Set the following environment variables in .env file:
+    ```
+    INFURA_API_KEY=your_infura_api_key
+    PRIVATE_KEY=your_wallet_private_key
+    ETHERSCAN_API_KEY=your_etherscan_api_key
+    ```
+
+    <Admonition type="warning">
+    Never commit your .env file or share your private keys. Make sure .env is included in your .gitignore file.
+    </Admonition>
+
+3. Install dependencies and compile the contract:
+    ```bash
+    npm install
+    npx hardhat compile
+    ```
+
+4. Before deploying the contract, test it using the command:
+    ```bash
+    npx hardhat test
+    ```
+
+    If all test cases passed, run the following command to deploy the contract:
+    ```bash
+    npx hardhat run scripts/deploy.js --network sepolia
+    ```
+    
+    Ensure that all the contract is successfully deployed before proceeding.
+
+    <Admonition type="success">
+    Environment variables loaded:
+    INFURA_API_KEY: Present
+    PRIVATE_KEY: Present
+    ETHERSCAN_API_KEY: Present
+    Compiled 1 Solidity file successfully (evm target: paris).
+    Environment variables loaded:
+    INFURA_API_KEY: Present
+    PRIVATE_KEY: Present
+    ETHERSCAN_API_KEY: Present
+    Deploying Web3DBHashManagement...
+    Contract deployed to: YOUR_CONTRACT_ADDRESS
+    </Admonition>
+
+5. Since we have ETHERSCAN_API_KEY set up in our environment variables, let's verify the contract on Sepolia Etherscan:
+    ```bash
+    npx hardhat verify --network sepolia YOUR_CONTRACT_ADDRESS
+    ```
+
+    <Admonition type="success">
+    For more information, visit https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#verifying-on-sourcify
+    Successfully submitted source code for contract
+    contracts/Web3DBHashManagement.sol:Web3DBHashManagement at YOUR_CONTRACT_ADDRESS
+    for verification on the block explorer.
+    Waiting for verification result...
+
+    Successfully verified contract Web3DBHashManagement on the block explorer.
+    https://sepolia.etherscan.io/address/YOUR_CONTRACT_ADDRESS#code
+    </Admonition>
+
+## Verifying the Deployment through Etherscan
+
+To verify that the deployment is successful and the contracts are running properly, you can perform the following checks:
+
+1. Visit the contract address on Sepolia Etherscan (https://sepolia.etherscan.io/address/YOUR_CONTRACT_ADDRESS#code)
+2. Check the "Contract" tab to ensure the source code is verified
+3. Use the "Read Contract" section to test view functions
+4. Use the "Write Contract" section to test state-changing functions
+
+## Troubleshooting
+
+If you face any problems during the deployment process or while verifying the nodes, consider the following troubleshooting steps:
+
+- **Insufficient Funds**: Ensure your wallet has enough Sepolia ETH for deployment
+- **Nonce Issues**: If you get nonce-related errors, try resetting your account nonce in Metamask
+- **Verification Failures**: 
+  - Double-check that your Etherscan API key is correct
+  - Ensure the contract was compiled with the exact same settings as deployment
+  - Make sure you're using the correct Solidity compiler version
+- **Network Issues**:
+  - Verify your Infura API key is valid
+  - Check if the Sepolia network is experiencing any delays
+  - Try increasing the gas limit if transactions are failing
+
+## Local Development
+Since we are using Sepolia test net, we don't need local development. So you can skip this section or try it if you are curious :).
+For local development and testing, you can use Hardhat's local network:
+
+```bash
+npx hardhat node
+npx hardhat run scripts/deploy.js --network localhost
+```
+Make sure your deploy.js is properly configured:
+
+```javascript
+async function main() {
+  console.log("Deploying Web3DBHashManagement...");
+
+  const Contract = await ethers.getContractFactory("Web3DBHashManagement");
+  const contract = await Contract.deploy();
+
+  // Wait for deployment to complete
+  await contract.waitForDeployment();
+
+  // Get the deployed contract address
+  const address = await contract.getAddress();
+  console.log("Contract deployed to:", address);
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+```
+## Environment Setup
+
+Make sure your hardhat.config.js is properly configured:
+
+```javascript
+require("@nomicfoundation/hardhat-toolbox");
+require("dotenv").config();
+
+module.exports = {
+  solidity: "0.8.28",
+  networks: {
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts: [process.env.PRIVATE_KEY]
+    }
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY
+  }
+};
+```
+
+## Conclusion
+
+After following these steps, your Web3DBHashManagement contract should be deployed and verified on the Sepolia testnet. The contract is now ready for integration with your application.
+
+Remember to:
+- Save your contract address for future reference
+- Document any custom deployment configurations
+- Test all contract functions through Etherscan before proceeding with the integration
+- Monitor the contract's initial transactions to ensure everything is working as expected
+
+For further assistance or questions about deployment, please reach out to our support team or simply search on internet.

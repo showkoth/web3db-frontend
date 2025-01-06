@@ -1,0 +1,76 @@
+---
+slug: /Access Control
+sidebar_position: 6
+---
+
+import Admonition from "@theme/Admonition";
+
+# Access Control
+
+## Overview
+
+Access control in Web3DB ensures secure and authorized access to sensitive data by leveraging attribute-based encryption (ABE) and decentralized storage. This mechanism protects data confidentiality and enforces fine-grained permissions.
+
+<Admonition type="info" title="Key Concepts">
+  - **Attribute-Based Encryption (ABE)**: A cryptographic approach for secure data sharing based on user attributes.
+  - **Role-Based Access Control (RBAC)**: Defines access permissions based on roles assigned to users.
+  - **Decentralized Identity (DID)**: Utilizes blockchain for verifying user identities without relying on a central authority.
+</Admonition>
+
+## Attribute-Based Encryption (ABE)
+
+Web3DB integrates ABE to enforce fine-grained access control policies. Data is encrypted with a policy that specifies required attributes for decryption. Only users with matching attributes can access the data.
+
+### Key Features of ABE:
+- Policy-based encryption for flexible access control
+- Secure data sharing without revealing sensitive information
+- Scalability for large datasets and user groups
+
+### Benefits:
+- Reduces reliance on centralized access control systems
+- Ensures data confidentiality even in untrusted environments
+- Enables dynamic access policies without re-encrypting data
+
+## Role-Based Access Control (RBAC)
+
+RBAC complements ABE by grouping users into roles, simplifying the management of permissions. Each role is assigned specific access rights based on organizational requirements.
+
+### Key Features:
+- Simplified access control management
+- Centralized role definitions for consistency
+- Hierarchical roles to support complex organizational structures
+
+
+## Decentralized Identity (DID)
+
+Decentralized Identity ensures secure user authentication and authorization without relying on a single point of failure. Web3DB integrates blockchain-based DIDs to verify user identities, providing enhanced security and privacy.
+
+### Key Features:
+- Self-sovereign identity management
+- Reduced dependency on third-party authentication services
+- Blockchain-backed trust and verification
+
+### Benefits:
+- Prevents identity spoofing and unauthorized access
+- Facilitates secure cross-platform authentication
+- Ensures user privacy and control over personal data
+
+## Implementation Workflow
+
+1. **User Authentication**:
+   - The user is authenticated using their DID credentials.
+   
+2. **Attribute Verification**:
+   - ABE policies verify the user’s attributes to determine data access.
+   
+3. **Role Validation**:
+   - The user’s role is validated via RBAC to define their permissions.
+   
+4. **Data Access**:
+   - Encrypted data is decrypted only if the user’s attributes and role match the required access policy.
+
+
+For additional support or documentation:
+- [Web3DB Documentation](https://docs.web3db.com)
+- [Attribute-Based Encryption Overview](https://en.wikipedia.org/wiki/Attribute-based_encryption)
+- [Decentralized Identity (DID) Documentation](https://w3c.github.io/did-core/)

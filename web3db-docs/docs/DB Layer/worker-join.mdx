@@ -1,0 +1,86 @@
+---
+slug: /DB Layer/join-master-node
+sidebar_position: 5
+---
+
+import Admonition from "@theme/Admonition";
+import CodeBlock from "@theme/CodeBlock";
+
+# Want to join Web3DB?
+
+This guide explains how to connect a Spark worker node to the master node. The master node is currently running on our server, and any external worker node can join it using Docker Compose.
+
+---
+## **Prerequisites**
+
+Before proceeding, ensure that you have the following prerequisites installed on your system:
+
+- **Docker**: [Install Docker](https://docs.docker.com/get-docker/)
+- **Docker Compose**: [Install Docker Compose](https://docs.docker.com/compose/install/)
+- **Git**: [Install Git](https://git-scm.com/downloads)
+
+## **Steps to Join the Master Node**
+
+Follow these steps to set up and connect your worker node to the Spark master node:
+
+1. **Clone the Web3DB backend repository**:
+
+   ```bash
+   git clone https://github.com/showkoth/web3db-backend.git
+   cd web3db-backend/Infrastructure/Database/spark_worker
+   ```
+
+2. **Start the Spark worker node**:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+   This command will start the Spark worker node and connect it to the master node using the Ngrok tunnel URL.
+
+---
+
+## **Verifying Connection**
+
+To verify that your worker node has successfully connected to the master node, you can follow these steps:
+
+### **Check Docker Logs**
+
+Run the following command to check the logs of your worker node:
+
+```bash
+docker logs <container-name>
+```
+
+Look for log messages indicating a successful connection to the master node.
+
+### **Check the Spark Master UI**
+
+Visit the **Spark Master UI** at:
+
+[http://129.74.152.201:8081/](http://129.74.152.201:8081/)
+
+On the dashboard, you should see your worker node listed under the "Workers" section. The dashboard provides details such as the number of cores, memory usage, and the status of each worker node.
+
+---
+
+## **Troubleshooting**
+
+If your worker node does not appear on the Spark master dashboard or if the logs indicate a failure, consider the following troubleshooting steps:
+
+1. **Check the Ngrok Tunnel**:
+   Ensure that the Ngrok tunnel for the master node is active and reachable. You can verify this by visiting the Ngrok dashboard or checking the public TCP URL used in your `docker-compose.yml` file.
+
+2. **Verify the Configuration**:
+   Ensure that the `SPARK_MASTER_URL` in your `docker-compose.yml` file matches the current public URL of the master node's Ngrok tunnel.
+
+3. **Check Docker Logs**:
+   Inspect the logs for error messages or connection issues using the `docker logs` command.
+
+---
+
+## **Additional Resources**
+
+- [Apache Spark Documentation](https://spark.apache.org/docs/latest/)
+- [Ngrok Documentation](https://ngrok.com/docs)
+- [Bitnami Spark Docker Image](https://hub.docker.com/r/bitnami/spark)

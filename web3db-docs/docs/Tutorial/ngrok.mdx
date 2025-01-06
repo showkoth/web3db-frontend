@@ -1,0 +1,163 @@
+---
+slug: /Tutorial/ngrok-setup
+sidebar_position: 10
+---
+
+import Admonition from "@theme/Admonition";
+import CodeBlock from "@theme/CodeBlock";
+
+# Installation Ngrok
+
+To set up a Spark cluster that allows worker nodes to join from any network, we need to expose the private network to the internet. **Ngrok** simplifies this process by handling NAT/Port forwarding automatically. It enables external access to services running inside private networks.
+
+For more details, visit the [Ngrok website](https://ngrok.com).
+
+## **Prerequisites**
+
+Before setting up Ngrok, ensure your system meets the following requirements:
+
+### **Software Requirements**
+
+- **Git**: [Install Git](https://git-scm.com/downloads)
+- **Docker** (for Docker-based setup): [Install Docker](https://docs.docker.com/get-docker/)
+- **Docker Compose** (for Docker-based setup): [Install Docker Compose](https://docs.docker.com/compose/install/)
+- **Homebrew** (for MacOS users, optional): [Install Homebrew](https://brew.sh/)
+
+### **Ngrok Authentication Token**
+
+- You need an **Ngrok authtoken** to authenticate and use Ngrok services.
+- Sign up on the [Ngrok website](https://ngrok.com/signup) and retrieve your authtoken from the dashboard.
+- You need to buy their subscription for exposing tcp ports which is required for spark connection. Their free version only allows http connections.
+
+---
+
+## Ngrok Setup
+
+Ngrok can be set up manually on different operating systems or using Docker (preferred for consistency and scalability). Below are the detailed instructions for both approaches.
+
+### **Manual Setup**
+
+#### **MacOS**
+
+```bash
+brew install ngrok/ngrok/ngrok
+ngrok config add-authtoken <your-authtoken-here>
+```
+
+#### **Ubuntu**
+
+```bash
+curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+  | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+  && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" \
+  | sudo tee /etc/apt/sources.list.d/ngrok.list \
+  && sudo apt update \
+  && sudo apt install ngrok
+ngrok config add-authtoken <your-authtoken-here>
+```
+
+#### **Expose Ports**
+
+After installing Ngrok, you can expose specific ports using the following commands:
+
+```bash
+# Expose HTTP service on port 8080
+ngrok http http://localhost:8080
+
+# Expose TCP service on port 7077 (for Spark)
+ngrok tcp 7077
+```
+
+---
+
+### **Docker Setup (Preferred)**
+
+Using Docker ensures consistency across environments and simplifies the process of managing Ngrok tunnels. Below is the `docker-compose.yaml` file for running Ngrok as a service.
+
+#### **docker-compose.yaml**
+
+```yaml
+services:
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - 4040:4040
+```
+
+- **Ports**:
+  - `4040`: Ngrok web dashboard for monitoring tunnel status.
+
+---
+
+### **Ngrok Configuration File**
+
+Create a configuration file named `ngrok.yml` based on your operating system.
+
+#### **Ngrok Configuration for MacOS**
+
+```yaml
+version: 3
+
+agent:
+  authtoken: <your-authtoken-here>
+
+tunnels:
+  basic:
+    proto: http
+    addr: http://host.docker.internal:8080
+  tcp_tunnel:
+    proto: tcp
+    addr: host.docker.internal:7077
+```
+
+#### **Ngrok Configuration for Linux**
+
+```yaml
+version: 3
+
+agent:
+  authtoken: <your-authtoken-here>
+
+tunnels:
+  basic:
+    proto: http
+    addr: localhost:8081
+  tcp_tunnel:
+    proto: tcp
+    addr: localhost:7077
+```
+
+- **Fields**:
+  - `authtoken`: Replace `<your-authtoken-here>` with your Ngrok authentication token.
+  - `addr`: The internal address of the service to expose. For MacOS, use `host.docker.internal`; for Linux, use the public IP of your machine.
+  - `proto`: The protocol to use (`http` for web services, `tcp` for Spark).
+
+---
+
+## Ngrok Web Dashboard
+
+Once the Ngrok service is running, you can monitor your tunnels using the Ngrok dashboard:
+
+- **Dashboard URL**: [http://localhost:4040/status](http://localhost:4040/status)
+
+---
+
+## Best Practices
+
+- **Security**: Always keep your `authtoken` confidential and avoid exposing sensitive services publicly.
+- **Persistence**: Use Docker with a configuration file for persistent and automated Ngrok tunnel management.
+- **Monitoring**: Regularly check the Ngrok dashboard to monitor active tunnels and ensure they are functioning correctly.
+
+---
+
+For additional support or documentation:
+- [Ngrok Documentation](https://ngrok.com/docs)
+- [Apache Spark Documentation](https://spark.apache.org/docs/latest/)

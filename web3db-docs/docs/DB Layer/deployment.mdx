@@ -1,0 +1,105 @@
+---
+slug: /DB Layer/deployment
+sidebar_position: 3
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import Admonition from "@theme/Admonition";
+
+# Deployment
+
+## Deploying Web3DB Database Components
+
+This guide will walk you through deploying the Web3DB components using Docker Compose, including Apache Spark and IPFS services.
+
+## Prerequisites
+
+- Docker: [Install Docker](https://docs.docker.com/get-docker/)
+- Docker Compose: [Install Docker Compose](https://docs.docker.com/compose/install/)
+
+## Deployment Steps
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/showkoth/web3db-backend.git
+   cd web3db-backend/Infrastructure/Database
+   ```
+
+2. Start the containers:
+   ```bash
+   sudo docker-compose up -d
+   ```
+
+   Expected output:
+   ```bash
+   [+] Running 4/6
+    ✔ Network database_default           Created
+    ✔ Network database_spark-network     Created
+    ✔ Container database-spark-master-1  Started
+    ✔ Container database-ipfs-1          Started
+    ✔ Container database-spark-worker-1  Started
+    ✔ Container database-engine-1        Started
+   ```
+
+3. Verify container status:
+   ```bash
+   sudo docker-compose ps
+   ```
+4. To stop the containers:
+   ```bash
+   sudo docker-compose down
+   ```
+This will shut down all of the containers and services. You can start the services again following step 1 and 2.
+<Admonition type="success">
+  The Web3DB components are now deployed and running!
+</Admonition>
+
+
+## Verification
+To verify that the deployment is successful and the nodes are running properly, you can perform the following checks:
+1. API Service: http://localhost:8000 (Swagger UI)
+2. Spark Master UI: http://localhost:8081
+3. IPFS: http://localhost:5001/api/v0/version
+
+## Monitoring
+
+You can view the container logs:
+
+```bash
+# All services
+docker-compose logs
+
+# Specific service
+docker-compose logs database-spark-master-1
+docker logs database-engine-1
+
+```
+
+## Troubleshooting
+
+If you face any problems during the deployment process or while verifying the nodes, consider the following troubleshooting steps:
+
+- Ensure that Docker and Docker Compose are properly installed on your system.
+- Verify that the docker-compose.yml file is correctly formatted and contains the required services and configurations.
+- Check the logs of the containers using the docker-compose logs command to identify any error messages or warnings.
+- Ensure that the necessary ports are available and not being used by other applications.
+- See the official documentation of the respective technologies (Apache Spark, IPFS) for technology-specific troubleshooting guides.
+
+## Maintenance
+
+Basic commands:
+```bash
+# Update services
+docker-compose pull
+docker-compose up -d
+
+# Restart services
+docker-compose restart [service-name]
+
+# Stop all services
+docker-compose down
+```
+
+For additional support or documentation:
+- [Apache Spark Documentation](https://spark.apache.org/docs/latest/)
+- [IPFS Documentation](https://docs.ipfs.io/)

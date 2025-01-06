@@ -1,0 +1,410 @@
+---
+slug: /api-layer
+sidebar_position: 9
+---
+
+import Admonition from "@theme/Admonition";
+import CodeBlock from "@theme/CodeBlock";
+
+# API Documentation
+
+This document provides an overview of the **SQL State Management API** built using FastAPI. The API manages SQL states with IPFS versioning, enabling users to execute SQL queries, share data, and manage state hashes.
+
+---
+
+## **Overview**
+
+The API consists of endpoints for:
+
+- Executing SQL queries and managing state hashes.
+- Sharing and revoking access to data using CIDs (Content Identifiers).
+- Retrieving the latest hash and history of table operations.
+- Listing tables owned by a user and accessing shared data.
+
+---
+
+## **Endpoints**
+
+### **1. Root Endpoint**
+
+Redirects to the API documentation.
+
+```javascript
+GET /
+```
+
+---
+
+### **2. Execute SQL Query**
+
+Executes an SQL query with optional state hash resolution. 
+
+**API Endpoint**
+```javascript
+POST /query
+```
+**Request Body**
+```javascript
+{
+  "query": "SELECT * FROM table_name",
+  "user_id": "0x68ef100cC9dAdE0bb67a0aE99A02CDd1eaE54A2f" (optional),
+  "state_hash": "QmHashExample123" (optional)
+}
+```
+We can perform any sql queries (create, insert, select) using this API. 
+
+### CREATE QUERY
+**Request**
+
+```javascript
+curl -X 'POST' \
+  'http://129.74.152.201:8000/query' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "query": "create table users ( id INT, first_name VARCHAR(50), last_name VARCHAR(50), email VARCHAR(50), gender VARCHAR(50), age INT);"
+}'
+```
+**Response**
+
+```javascript
+{
+  "type": "create",
+  "hash": "QmZHtoW6syvj52uN3qNobVYqVpGt5V9Trcei8JxeyaM1bK",
+  "data": null,
+  "includes_shared": false,
+  "shared_count": 0,
+  "own_count": 0
+}
+```
+
+### INSERT QUERY
+**Request**
+
+```javascript
+curl -X 'POST' \
+  'http://129.74.152.201:8000/query' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "query": "insert into users values (5, '\''Dugald'\'', '\''Cull'\'', '\''dcull4@usgs.gov'\'', '\''Male'\'', 15);"
+}'
+```
+
+**Response**
+
+```javascript
+{
+  "type": "insert",
+  "hash": "QmfLGz4rgY4HFVuVcVWQjRYqsSZxvKwDLqqrpp89sUbJ5L",
+  "data": null,
+  "includes_shared": false,
+  "shared_count": 0,
+  "own_count": 0
+}
+```
+
+### SELECT QUERY
+**Request**
+
+```javascript
+curl -X 'POST' \
+  'http://129.74.152.201:8000/query' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "query": "select * from users;"
+}'
+```
+
+**Response**
+
+```javascript
+{
+  "type": "select",
+  "hash": "QmPeN9S66FZt5GhPqmamojXYHUJ4NHQ6PPhrov96GToZQ7",
+  "data": [
+    {
+      "id": 1,
+      "first_name": "Marcelia",
+      "last_name": "Yggo",
+      "email": "myggo0@github.io",
+      "gender": "Female",
+      "age": 59,
+      "_owner": "0x68ef100cC9dAdE0bb67a0aE99A02CDd1eaE54A2f"
+    },
+    {
+      "id": 2,
+      "first_name": "Vonni",
+      "last_name": "Stobbe",
+      "email": "vstobbe1@github.com",
+      "gender": "Female",
+      "age": 78,
+      "_shared_by": "0x1f6Da6843Bad2a6F7a3fC7824289f197556f99b0"
+    }
+  ],
+  "includes_shared": true,
+  "shared_count": 1,
+  "own_count": 1
+}
+```
+
+---
+
+### **3. Get Latest Hash**
+
+Retrieves the latest hash for a user and table.
+
+**Request**
+```javascript
+url -X 'GET' \
+  'http://129.74.152.201:8000/hash/latest/0x68ef100cC9dAdE0bb67a0aE99A02CDd1eaE54A2f/users' \
+  -H 'accept: application/json'
+```
+
+**Response**
+
+```javascript
+{
+  "hash": "QmPeN9S66FZt5GhPqmamojXYHUJ4NHQ6PPhrov96GToZQ7"
+}
+```
+
+---
+
+### **4. Get Hash History**
+
+Retrieves the complete hash history for a user and table.
+
+**Request**
+```javascript
+curl -X 'GET' \
+  'http://129.74.152.201:8000/hash/history/0x68ef100cC9dAdE0bb67a0aE99A02CDd1eaE54A2f/users' \
+  -H 'accept: application/json'
+```
+
+**Response**
+
+```javascript
+{
+  "history": [
+    {
+      "hash": "QmfDn5AuBjaJX6xEQQHgU9bvVqARyJ4c6VV7TFk7hQf5sh",
+      "prevHash": "",
+      "type": "create",
+      "timestamp": "2025-01-04T23:49:36Z",
+      "flag": "latest",
+      "rowCount": 0
+    },
+    {
+      "hash": "QmPeN9S66FZt5GhPqmamojXYHUJ4NHQ6PPhrov96GToZQ7",
+      "prevHash": "QmfDn5AuBjaJX6xEQQHgU9bvVqARyJ4c6VV7TFk7hQf5sh",
+      "type": "insert",
+      "timestamp": "2025-01-04T23:50:12Z",
+      "flag": "latest",
+      "rowCount": 0
+    }
+  ]
+}
+```
+
+---
+
+### **5. List User Tables**
+
+Lists all tables owned by a user.
+
+**Request**
+```javascript
+curl -X 'GET' \
+  'http://129.74.152.201:8000/tables/0x68ef100cC9dAdE0bb67a0aE99A02CDd1eaE54A2f' \
+  -H 'accept: application/json'
+```
+
+**Response**
+
+```javascript
+{
+  "tables": [
+    "users",
+    "std"
+  ]
+}
+```
+
+---
+
+### **6. Share CID**
+
+Shares a CID with another user.
+
+```javascript
+POST /share/cid
+```
+
+**Request**
+
+```javascript
+curl -X 'POST' \
+  'http://129.74.152.201:8000/share/cid' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "to_user": "0x68ef100cC9dAdE0bb67a0aE99A02CDd1eaE54A2f",
+  "table_name": "users2",
+  "cid": "QmSNksNxGCvTTFg8RXWcPgcxYnWsgk5Y8HfHY1WqQmDoNq"
+}'
+```
+
+**Response**
+
+```javascript
+{
+  "status": "success",
+  "message": "CID shared successfully"
+}
+```
+
+---
+
+### **7. Revoke CID Access**
+
+Revokes access to a shared CID from a user.
+
+```javascript
+POST /revoke/cid
+```
+
+**Request**
+
+```javascript
+curl -X 'POST' \
+  'http://129.74.152.201:8000/revoke/cid' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "from_user": "0x1f6Da6843Bad2a6F7a3fC7824289f197556f99b0",
+  "table_name": "test",
+  "cid": "QmXGzDq4A8Kg3ShoCibKM4mvCKBQ4y62Lz2x89VbwTS3MS"
+}'
+```
+
+**Response**:
+
+```javascript
+{
+  "status": "success",
+  "message": "CID access revoked successfully"
+}
+```
+
+---
+
+### **8. Get Shared CIDs**
+
+Retrieves all shared CIDs for a user and table.
+
+**Request**
+
+```javascript
+curl -X 'GET' \
+  'http://129.74.152.201:8000/shared/cids/0x1f6Da6843Bad2a6F7a3fC7824289f197556f99b0/test' \
+  -H 'accept: application/json'
+```
+
+**Response**
+
+```javascript
+{
+  "cids": [
+    "QmXGzDq4A8Kg3ShoCibKM4mvCKBQ4y62Lz2x89VbwTS3MS"
+  ],
+  "owners": [
+    "0x68ef100cC9dAdE0bb67a0aE99A02CDd1eaE54A2f"
+  ]
+}
+```
+
+---
+
+### **9. Get State**
+
+Retrieves the state information for a specific hash.
+
+**Request**
+
+```javascript
+curl -X 'GET' \
+  'http://129.74.152.201:8000/state/QmXGzDq4A8Kg3ShoCibKM4mvCKBQ4y62Lz2x89VbwTS3MS' \
+  -H 'accept: application/json'
+
+```
+
+**Response**
+
+```javascript
+{
+  "content": "CREATE TABLE users (\n  id INTEGER,\n  first_name VARCHAR,\n  last_name VARCHAR,\n  email VARCHAR,\n  gender VARCHAR,\n  age INTEGER\n);\n\n\nINSERT INTO users (id, first_name, last_name, email, gender, age) VALUES\n(2, 'Vonni', 'Stobbe', 'vstobbe1@github.com', 'Female', 78);\n\n\nCREATE TABLE test (\n  id INTEGER,\n  first_name VARCHAR (50),\n  last_name VARCHAR (50),\n  email VARCHAR (50),\n  gender VARCHAR (50),\n  age INTEGER\n);\n\n\nINSERT INTO test (id, first_name, last_name, email, gender, age) VALUES\n(5, 'Dugald', 'Cull', 'dcull4@usgs.gov', 'Male', 15);\n",
+  "hash": "QmXGzDq4A8Kg3ShoCibKM4mvCKBQ4y62Lz2x89VbwTS3MS",
+  "table_mappings": {},
+  "previous_hash": null
+}
+```
+
+---
+
+### **10. Cleanup**
+
+Cleans up all temporary tables and states.
+
+```javascript
+POST /cleanup
+```
+
+**Response**
+
+```javascript
+{
+  "status": "success"
+}
+```
+
+---
+
+## **Error Handling**
+
+The API returns appropriate HTTP status codes and error messages in case of failures.
+
+### Example Error Response:
+
+```javascript
+{
+  "detail": "Hash not found"
+}
+```
+
+**Common Errors**:
+
+- **400 Bad Request**: Invalid request parameters.
+- **404 Not Found**: Requested resource not found.
+- **500 Internal Server Error**: Unexpected server error.
+
+---
+
+## **Dependencies**
+
+The following external libraries and modules are used in this API:
+
+- **FastAPI**: Web framework for building APIs.
+- **sqlparse**: SQL query parsing.
+- **pydantic**: Data validation and settings management.
+- **Web3.py**: Interaction with the Ethereum blockchain.
+- **IPFS Handler**: Custom module for managing IPFS data.
+
+---
+
+For additional support or documentation:
+
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Web3.py Documentation](https://web3py.readthedocs.io/)
+- [IPFS Documentation](https://docs.ipfs.io/)
