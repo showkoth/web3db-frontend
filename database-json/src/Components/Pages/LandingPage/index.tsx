@@ -14,6 +14,7 @@ import ShowkotImage from "../../../Assets/Images/showkot.jpg";
 import GustavoImage from "../../../Assets/Images/gustavo.jpg";
 import HaijanImage from "../../../Assets/Images/HaijanPhoto.jpg";
 import JakeImage from "../../../Assets/Images/jake.jpg";
+import ChandanImage from "../../../Assets/Images/ChandanImage.jpg";
 import NSFLogoURL from "../../../Assets/Images/NsfGrant.png"; // Placeholder URL for NSF logo
 import NDLogoURL from "../../../Assets/Images/NotreDame.png"; // Placeholder - Replace with actual URL
 import UGALogoURL from "../../../Assets/Images/UGA.png"; // Placeholder - Replace with actual URL
@@ -42,6 +43,13 @@ const teamMembers = [
     imgUrl: JakeImage,
     profileUrl: "https://www.linkedin.com/in/jake-chandler-a50203219/",
   },
+  {
+    name: "Chandan Narayana",
+    role: "Lead Developer",
+    university: "University of Georgia",
+    imgUrl: ChandanImage,
+    profileUrl: "https://www.linkedin.com/in/chandan-narayana-53b5671a2/",
+  }
 ];
 const principalInvestigators = [
   {
