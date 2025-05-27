@@ -81,7 +81,7 @@ We are working to implement **zero-trust access control policy** into our system
 To dive deeper into our decentralized database engine and explore its capabilities, please refer to the following sections of our documentation:
 
 - [API Layer](./api-layer)
-- [Decentralized Storage and Distributed Query Engine](./DB%20Layer)
-- [Access Control](./smart-contract)
+- [Decentralized Storage and Distributed Query Engine](./db-layer)
+- [Access Control](./access-control/smart-contract)
 
 We invite you to join us on this transformative journey as we redefine the landscape of database technology and champion the cause of user data sovereignty. Together, we will unlock the true potential of decentralized systems and pave the way for a more secure, transparent, and empowering digital future.

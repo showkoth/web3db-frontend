@@ -1,5 +1,5 @@
 ---
-slug: /Tutorial/spark-cluster
+slug: /tutorial/spark-cluster
 sidebar_position: 11
 ---
 
@@ -58,7 +58,7 @@ docker run -d --name spark-master \
 Below is a `docker-compose.yaml` file to set up the Spark master node:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   spark-master:
@@ -113,7 +113,7 @@ docker run -d --network host \
 Below is a `docker-compose.yaml` configuration to set up the Spark worker node. Replace `${SPARK_MASTER_URL}` with your actual Ngrok TCP tunnel URL for the master node.
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   spark-worker:
@@ -165,6 +165,7 @@ The Spark master web UI provides an overview of active worker nodes, running job
 ---
 
 For additional support or documentation:
+
 - [Ngrok Documentation](https://ngrok.com/docs)
 - [Apache Spark Documentation](https://spark.apache.org/docs/latest/)
 - [Bitnami Spark Docker Image](https://hub.docker.com/r/bitnami/spark)
