@@ -85,7 +85,6 @@ By leveraging blockchain (smart contract) and TEE, we aim to create a decentrali
 To dive deeper into our decentralized database engine and explore its capabilities, please refer to the following sections of our documentation:
 
 - [API Layer](./api-layer)
-- [Access Control and Smart Contract](./Access%20Control)
 - [Decentralized Storage and Distributed Query Engine](./DB%20Layer)
 
 We invite you to join us on this transformative journey as we redefine the landscape of database technology and champion the cause of user data sovereignty. Together, we will unlock the true potential of decentralized systems and pave the way for a more secure, transparent, and empowering digital future.
