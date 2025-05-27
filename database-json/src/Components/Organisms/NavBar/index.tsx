@@ -32,6 +32,9 @@ function ResponsiveAppBar() {
     if (page === "Documentation") {
       window.location.href = "https://docs.web3db.org/docs/intro";
     }
+    if (page === "Demo") {
+      window.location.href = "http://129.74.152.201:8000/docs#";
+    }
     // Handle other page navigations if necessary
     handleCloseNavMenu();
   };

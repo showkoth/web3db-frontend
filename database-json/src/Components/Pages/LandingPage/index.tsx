@@ -89,7 +89,7 @@ const LandingPage: React.FC = () => {
 
   const handleNormalRoute = () => navigate("/run-query");
   const handleMetaMaskRoute = () => {
-    window.location.href = "https://metamask.web3db.org";
+    window.location.href = "http://129.74.152.201:8000/docs#";
   };
 
   return (
