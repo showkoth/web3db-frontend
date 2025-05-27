@@ -15,7 +15,7 @@ Web3DB is a **distributed database engine** that revolutionizes data management 
   Our decentralized database engine is built upon robust: data storage (IPFS), Smart Contract (Blockchain) and TEE (Intel SGX) based access control, distributed query engine (Spark) that seamlessly integrates a high-performance Python APIs with lots of others sophisticated technology stacks.
 </Admonition>
 
-**If you are looking for the deployment instructions, please check our github repository [here](https://github.com/nd-dsp-lab/web3db-backend).**
+**If you are looking for the technical details or deployment instructions, please check our github repository [here](https://github.com/nd-dsp-lab/web3db-backend).**
 
 ## Project Overview
 
@@ -70,15 +70,11 @@ required data from IPFS using appropriate CIDs returned by web3db index.
 
 ### Decentralization and User Data Ownership
 
-Decentralization lies at the core of our database engine's philosophy, empowering users with true ownership and control over their data. By eliminating the need for a constantly running, centralized database instance, we mitigate the risks associated with single points of failure and data breaches.
-
-Through our decentralized architecture, users retain complete control over their data, with the ability to grant or revoke access permissions according to their requirement. This paradigm shift in data ownership puts the power back in the hands of the users, fostering trust, privacy, and security in the digital landscape.
+Decentralization lies at the core of our database engine's philosophy, empowering users with true ownership and control over their data. By eliminating the need for a constantly running, centralized database instance, we mitigate the risks associated with single points of failure and data breaches. Through our decentralized architecture, users retain complete control over their data, with the ability to grant or revoke access permissions according to their requirement. This paradigm shift in data ownership puts the power back in the hands of the users, fostering trust, privacy, and security in the digital landscape.
 
 ### Zero Trust Access Control
 
-We are working to implement **zero-trust access control policy** into our system. This research aims to establish a secure, reliable framework for data access that eliminates the reliance on centralized authorities and traditional trust models.
-
-By leveraging blockchain (smart contract) and TEE, we aim to create a decentralized access control system that enables fine-grained, dynamic permissions management without compromising data privacy or security.
+We are working to implement **zero-trust access control policy** into our system. This research aims to establish a secure, reliable framework for data access that eliminates the reliance on centralized authorities and traditional trust models. By leveraging blockchain (smart contract) and TEE, we aim to create a decentralized access control system that enables fine-grained, dynamic permissions management without compromising data privacy or security.
 
 ## Getting Started
 
@@ -86,5 +82,6 @@ To dive deeper into our decentralized database engine and explore its capabiliti
 
 - [API Layer](./api-layer)
 - [Decentralized Storage and Distributed Query Engine](./DB%20Layer)
+- [Access Control](./smart-contract)
 
 We invite you to join us on this transformative journey as we redefine the landscape of database technology and champion the cause of user data sovereignty. Together, we will unlock the true potential of decentralized systems and pave the way for a more secure, transparent, and empowering digital future.
