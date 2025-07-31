@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useWeb3 } from "../../../context/Web3Context";
 import MetaMaskModal from "../MetaMaskModal";
 
-const pages = ["Demo", "Documentation"];
+const pages = ["Home", "Demo", "Documentation"];
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -53,7 +53,16 @@ function ResponsiveAppBar() {
       window.location.href = "https://docs.web3db.org/docs/intro";
     }
     if (page === "Demo") {
-      setIsMetaMaskModalOpen(true);
+      if (isConnected) {
+        // If already connected, go directly to the query page
+        navigate("/run-query");
+      } else {
+        // If not connected, show MetaMask modal
+        setIsMetaMaskModalOpen(true);
+      }
+    }
+    if (page === "Home") {
+      navigate("/");
     }
     // Handle other page navigations if necessary
     handleCloseNavMenu();
@@ -74,7 +83,7 @@ function ResponsiveAppBar() {
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            onClick={() => navigate("/")}
             sx={{
               mr: 3,
               display: { xs: "none", md: "flex" },
@@ -83,6 +92,10 @@ function ResponsiveAppBar() {
               letterSpacing: ".3rem",
               color: "inherit",
               textDecoration: "none",
+              cursor: "pointer",
+              "&:hover": {
+                opacity: 0.8
+              }
             }}
           >
             WEB3DB
@@ -129,7 +142,7 @@ function ResponsiveAppBar() {
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            onClick={() => navigate("/")}
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
@@ -139,6 +152,10 @@ function ResponsiveAppBar() {
               letterSpacing: ".3rem",
               color: "inherit",
               textDecoration: "none",
+              cursor: "pointer",
+              "&:hover": {
+                opacity: 0.8
+              }
             }}
           >
             WEB3DB

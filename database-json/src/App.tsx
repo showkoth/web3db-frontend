@@ -11,13 +11,14 @@ import SeeTables from "./Components/Pages/SeeTables";
 import { SqlProvider } from "./context/SqlContext";
 import { Web3Provider } from "./context/Web3Context";
 import SideBar from "./Components/Organisms/SideBar";
+import ResponsiveAppBar from "./Components/Organisms/NavBar";
 import LandingPage from "./Components/Pages/LandingPage";
 interface MainLayoutProps {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
 }
 
-// Layout component with sidebar
+// Layout component with sidebar and navbar
 const MainLayout: React.FC<MainLayoutProps> = ({
   toggleSidebar,
   isSidebarOpen,
@@ -25,10 +26,24 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   const ContentContainer = styled.div`
     margin-left: ${isSidebarOpen ? "250px" : "0"};
     transition: margin-left 0.3s;
+    padding-top: 70px; /* Add space for fixed navbar */
+  `;
+
+  const NavBarContainer = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
   `;
 
   return (
     <>
+      <NavBarContainer>
+        <ResponsiveAppBar />
+      </NavBarContainer>
       <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <ContentContainer>
         <Routes>
