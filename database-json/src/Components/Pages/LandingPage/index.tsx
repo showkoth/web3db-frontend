@@ -219,35 +219,15 @@ const LandingPage: React.FC = () => {
           Empowering Innovation with Web3DB
         </Typography>
         <Typography variant="h6" sx={{ mb: 4 }}>
-          Web3DB is redefining the landscape of digital sovereignty and data
-          management through its commitment to decentralized, zero-trust
-          computing and storage frameworks. At its core, Web3DB leverages
-          advanced decentralized technologies to enable secure, autonomous data
-          exchanges that empower individuals and organizations alike. By
-          harnessing the power of blockchain, IPFS, and smart contract
-          protocols, Web3DB introduces a new paradigm where data ownership and
-          privacy are not just priorities but foundational principles.
+          Web3DB is reshaping digital sovereignty and data management through a decentralized, zero-trust approach to computing and storage. At its core, it empowers individuals and organizations with secure, autonomous data exchange by leveraging trusted execution environments (TEEs), blockchain, IPFS, and smart contracts. In this new paradigm, data ownership and privacy are not just priorities—they are foundational principles.
         </Typography>
         <Typography variant="h6" sx={{ mb: 4 }}>
-          Our platform stands at the vanguard of the decentralized web movement,
-          providing robust solutions for data integrity, verification, and
-          distribution without reliance on centralized authorities. This not
-          only enhances security and trust but also opens up unprecedented
-          opportunities for innovation in AI, machine learning, and beyond.
-          Through Web3DB, developers and researchers can access a global data
-          marketplace, where insights and information are shared freely yet
-          securely, catalyzing a new wave of technological advancements and
-          applications.
+          Our platform stands at the forefront of the decentralized web movement, delivering robust solutions for data integrity, verification, and distribution—free from centralized control. This approach not only strengthens security and trust but also unlocks new possibilities for innovation across healthcare, AI, machine learning, and beyond. By enabling a global data marketplace, Web3DB allows developers and researchers to share insights and information securely, driving the next wave of technological breakthroughs.
+
+
         </Typography>
         <Typography variant="h6" sx={{ mb: 4 }}>
-          The journey of Web3DB is marked by constant innovation, aiming to
-          tackle some of the most pressing challenges in data security, privacy,
-          and accessibility today. We are pioneering methods to streamline
-          decentralized query processing, enhance data encryption protocols, and
-          create a more resilient, efficient network for data storage and
-          retrieval. Our mission is to build a future where data can move freely
-          yet remain protected, empowering users worldwide to leverage their
-          data in ways never before possible.
+          Web3DB’s journey is defined by continuous innovation, addressing today’s most critical challenges in data security, privacy, and accessibility. We are pioneering advanced methods for secure query processing, strengthening encryption protocols, and building a more resilient and efficient network for data storage and retrieval. Our mission is to create a future where data can move freely yet remain protected—empowering users around the world to harness their data in transformative new ways.
         </Typography>
         <Box sx={{ my: 6, borderRadius: 2, overflow: "hidden" }}>
           <Typography
@@ -271,11 +251,7 @@ const LandingPage: React.FC = () => {
               textAlign: "center",
             }}
           >
-            Use Web3DB at your own risk. Web3DB is a research-purpose project
-            that evolves and improves with state-of-the-art research conducted
-            by the team. None of the authors, contributors, principal
-            investigators, or anyone else connected with the team, in any way
-            whatsoever, can be responsible for your use of the our platform.
+            Use Web3DB at your own risk. Web3DB is a research-oriented project that evolves alongside ongoing state-of-the-art research conducted by our team. The authors, contributors, principal investigators, and affiliated parties assume no responsibility for any consequences arising from the use of this platform.
           </Typography>
         </Box>
         <Typography variant="h4" sx={{ fontWeight: 700, mt: 6, mb: 3 }}>
