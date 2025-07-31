@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Row, Col, Table, Form, Alert } from "react-bootstrap";
+import { Row, Col, Table, Form, Alert, Pagination } from "react-bootstrap";
 import AceEditor from "react-ace";
 import "brace/mode/sql";
 import "brace/theme/tomorrow_night_eighties";
@@ -29,6 +29,10 @@ const RunQuery: React.FC = () => {
   const [inputQuery, setInputQuery] = useState<string>("SELECT * FROM patient_data WHERE PatientID = '38'");
   const [indexAttribute, setIndexAttribute] = useState<string>("PatientID");
   const [isMetaMaskModalOpen, setIsMetaMaskModalOpen] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 
   const handleInputChange = (newValue: string) => {
     const transformedValue = capitalizeSQLKeywords(newValue);
@@ -37,6 +41,11 @@ const RunQuery: React.FC = () => {
 
   const handleIndexAttributeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIndexAttribute(event.target.value);
+  };
+
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setRowsPerPage(Number(event.target.value));
+    setCurrentPage(1); // Reset to first page when changing rows per page
   };
 
   const handleRunQuery = () => {
@@ -55,6 +64,9 @@ const RunQuery: React.FC = () => {
       alert("Please enter an index attribute");
       return;
     }
+
+    // Reset pagination when running a new query
+    setCurrentPage(1);
 
     // Check if runQuery is defined
     if (runQuery) {
@@ -83,25 +95,108 @@ const RunQuery: React.FC = () => {
   const renderTable = () => {
     if (results && results.length > 0) {
       const columns = Object.keys(results[0]);
+      
+      // Calculate pagination
+      const totalPages = Math.ceil(results.length / rowsPerPage);
+      const startIndex = (currentPage - 1) * rowsPerPage;
+      const endIndex = startIndex + rowsPerPage;
+      const currentPageData = results.slice(startIndex, endIndex);
+      
       return (
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              {columns.map((col, index) => (
-                <th key={index}>{col}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {results.map((row: ResultRow, rowIndex: number) => (
-              <tr key={rowIndex}>
-                {columns.map((col, colIndex) => (
-                  <td key={colIndex}>{row[col]}</td>
+        <div>
+          {/* Results info and rows per page selector */}
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <strong>
+                Showing {startIndex + 1}-{Math.min(endIndex, results.length)} of {results.length} results
+              </strong>
+            </div>
+            <div className="d-flex align-items-center">
+              <span className="me-2">Rows per page:</span>
+              <Form.Select 
+                size="sm" 
+                style={{ width: 'auto' }}
+                value={rowsPerPage}
+                onChange={handleRowsPerPageChange}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </Form.Select>
+            </div>
+          </div>
+          
+          {/* Table */}
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                {columns.map((col, index) => (
+                  <th key={index}>{col}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {currentPageData.map((row: ResultRow, rowIndex: number) => (
+                <tr key={startIndex + rowIndex}>
+                  {columns.map((col, colIndex) => (
+                    <td key={colIndex}>{row[col]}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="d-flex justify-content-center mt-3">
+              <Pagination>
+                <Pagination.First 
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                />
+                <Pagination.Prev 
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                />
+                
+                {/* Page numbers */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum: number;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <Pagination.Item
+                      key={pageNum}
+                      active={pageNum === currentPage}
+                      onClick={() => setCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </Pagination.Item>
+                  );
+                })}
+                
+                <Pagination.Next 
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                />
+                <Pagination.Last 
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                />
+              </Pagination>
+            </div>
+          )}
+        </div>
       );
     } else if (message) {
       return <p>{message}</p>;
