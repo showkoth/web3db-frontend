@@ -120,7 +120,7 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
           </Typography>
           
           <Typography variant="body1" color="text.secondary" paragraph>
-            To access the Web3DB demo, you need to connect your MetaMask wallet.
+            To access the demo, you need to connect your Web3 wallet.
           </Typography>
 
           {error && (
