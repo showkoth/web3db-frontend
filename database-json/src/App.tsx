@@ -1,23 +1,20 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
-  Navigate,
 } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styled from "styled-components";
 import RunQuery from "./Components/Pages/RunQuery";
 import SeeTables from "./Components/Pages/SeeTables";
-import { SqlContext, SqlProvider } from "./context/SqlContext";
+import { SqlProvider } from "./context/SqlContext";
+import { Web3Provider } from "./context/Web3Context";
 import SideBar from "./Components/Organisms/SideBar";
 import LandingPage from "./Components/Pages/LandingPage";
 interface MainLayoutProps {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
-}
-interface ProtectedRouteProps {
-  children: React.ReactNode;
 }
 
 // Layout component with sidebar
@@ -53,21 +50,23 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <SqlProvider>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
+        <Web3Provider>
+          <SqlProvider>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
 
-            <Route
-              path="*"
-              element={
-                <MainLayout
-                  toggleSidebar={toggleSidebar}
-                  isSidebarOpen={isSidebarOpen}
-                />
-              }
-            />
-          </Routes>
-        </SqlProvider>
+              <Route
+                path="*"
+                element={
+                  <MainLayout
+                    toggleSidebar={toggleSidebar}
+                    isSidebarOpen={isSidebarOpen}
+                  />
+                }
+              />
+            </Routes>
+          </SqlProvider>
+        </Web3Provider>
       </div>
     </Router>
   );

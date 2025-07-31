@@ -7,6 +7,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import useTheme from "@mui/material/styles/useTheme";
 import Spline from "@splinetool/react-spline";
 import ResponsiveAppBar from "../../Organisms/NavBar";
+import MetaMaskModal from "../../Organisms/MetaMaskModal";
 import { Avatar, Container, Grid, Link, styled } from "@mui/material";
 import TaehoImage from "../../../Assets/Images/taeho.jpg";
 import WenzhanImage from "../../../Assets/Images/wenzhan.jpg";
@@ -86,10 +87,16 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [isMetaMaskModalOpen, setIsMetaMaskModalOpen] = React.useState(false);
+  
+  const handleDemoClick = () => {
+    setIsMetaMaskModalOpen(true);
+  };
 
-  const handleNormalRoute = () => navigate("/run-query");
-  const handleMetaMaskRoute = () => {
-    window.location.href = "http://129.74.152.201:8000/docs#";
+  const handleMetaMaskSuccess = () => {
+    setIsMetaMaskModalOpen(false);
+    // Navigate to the demo/query page after successful connection
+    navigate("/run-query");
   };
 
   return (
@@ -187,7 +194,7 @@ const LandingPage: React.FC = () => {
             </Typography>
             <Button
               variant="contained"
-              onClick={handleMetaMaskRoute}
+              onClick={handleDemoClick}
               sx={{
                 pointerEvents: "auto",
                 alignSelf: isMobile ? "center" : "flex-start",
@@ -380,7 +387,7 @@ const LandingPage: React.FC = () => {
       <Box sx={{ textAlign: "center", py: 8 }}>
         <Button
           variant="contained"
-          onClick={handleMetaMaskRoute}
+          onClick={handleDemoClick}
           sx={{
             pointerEvents: "auto",
             backgroundColor: theme.palette.primary.main,
@@ -389,6 +396,13 @@ const LandingPage: React.FC = () => {
           Explore Web3DB
         </Button>
       </Box>
+      
+      <MetaMaskModal
+        open={isMetaMaskModalOpen}
+        onClose={() => setIsMetaMaskModalOpen(false)}
+        onSuccess={handleMetaMaskSuccess}
+        onDisconnect={() => setIsMetaMaskModalOpen(false)}
+      />
     </Box>
   );
 };
