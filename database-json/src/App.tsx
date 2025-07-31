@@ -34,6 +34,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         <Routes>
           <Route path="/run-query" element={<RunQuery />} />
           <Route path="/see-table" element={<SeeTables />} />
+          <Route path="*" element={<RunQuery />} />
         </Routes>
       </ContentContainer>
     </>
@@ -54,7 +55,24 @@ function App() {
           <SqlProvider>
             <Routes>
               <Route path="/" element={<LandingPage />} />
-
+              <Route 
+                path="/run-query" 
+                element={
+                  <MainLayout
+                    toggleSidebar={toggleSidebar}
+                    isSidebarOpen={isSidebarOpen}
+                  />
+                } 
+              />
+              <Route 
+                path="/see-table" 
+                element={
+                  <MainLayout
+                    toggleSidebar={toggleSidebar}
+                    isSidebarOpen={isSidebarOpen}
+                  />
+                } 
+              />
               <Route
                 path="*"
                 element={

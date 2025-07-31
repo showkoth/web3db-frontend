@@ -40,6 +40,17 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
     }
   };
 
+  const handleContinueToDemo = () => {
+    console.log("Continue to Demo clicked");
+    if (onSuccess) {
+      console.log("Calling onSuccess callback");
+      onSuccess();
+    } else {
+      console.log("No onSuccess callback, just closing modal");
+      handleClose();
+    }
+  };
+
   const handleDisconnect = () => {
     disconnectWallet();
     if (onDisconnect) {
@@ -78,7 +89,7 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
         </DialogContent>
         <DialogActions>
           <Box sx={{ width: '100%' }}>
-            <Button onClick={handleClose} variant="contained" fullWidth sx={{ mb: 1 }}>
+            <Button onClick={handleContinueToDemo} variant="contained" fullWidth sx={{ mb: 1 }}>
               Continue to Demo
             </Button>
             <Button onClick={handleDisconnect} variant="outlined" fullWidth color="error">
