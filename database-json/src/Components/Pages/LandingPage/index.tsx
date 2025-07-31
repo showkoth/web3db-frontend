@@ -186,12 +186,7 @@ const LandingPage: React.FC = () => {
               gutterBottom
               sx={{ my: 6, textAlign: isMobile ? "center" : "left" }}
             >
-              The fundamental vision behind Web3DB is to return data ownership
-              to the owner, enabling secure data sharing and fostering AI
-              innovation. Utilizing spark nodes and IPFS, we are building a
-              decentralized network for query processing without centralized
-              coordination, with upcoming features like decentralized access
-              control with encryption.
+              The core vision behind Web3DB is to restore data ownership to individuals, empowering them with fine-grained access control, secure query processing, and safe data sharing. By leveraging blockchain, IPFS, and trusted execution environments (TEEs), we are building a decentralized, unified relational database network that anyone can join and contribute to.
             </Typography>
             <Button
               variant="contained"
