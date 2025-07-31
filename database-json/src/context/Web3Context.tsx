@@ -24,30 +24,12 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   const [isMetaMaskInstalled, setIsMetaMaskInstalled] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Check if wallet is already connected
-  const checkConnection = async () => {
-    try {
-      if (window.ethereum) {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.listAccounts();
-        if (accounts.length > 0) {
-          setAccount(accounts[0].address);
-          setProvider(provider);
-          setIsConnected(true);
-        }
-      }
-    } catch (error) {
-      console.error('Error checking connection:', error);
-    }
-  };
-
   // Check if MetaMask is installed
   useEffect(() => {
-    const checkMetaMask = async () => {
+    const checkMetaMask = () => {
       if (typeof window !== 'undefined' && window.ethereum) {
         setIsMetaMaskInstalled(true);
-        // Check if already connected
-        await checkConnection();
+        // Don't automatically connect - user must explicitly connect
       } else {
         setIsMetaMaskInstalled(false);
       }
