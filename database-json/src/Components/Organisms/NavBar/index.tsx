@@ -6,19 +6,26 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
+import Chip from "@mui/material/Chip";
 import AdbIcon from "@mui/icons-material/Adb";
 import MenuIcon from "@mui/icons-material/Menu";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import { useNavigate } from "react-router-dom";
+import { useWeb3 } from "../../../context/Web3Context";
+import MetaMaskModal from "../MetaMaskModal";
 
-const pages = ["Demo", "Documentation"];
+const pages = ["Home", "Demo", "Documentation"];
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
+  const [isMetaMaskModalOpen, setIsMetaMaskModalOpen] = React.useState(false);
+  const [anchorElWallet, setAnchorElWallet] = React.useState<null | HTMLElement>(null);
+  const navigate = useNavigate();
+  const { isConnected, account, disconnectWallet } = useWeb3();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -28,15 +35,43 @@ function ResponsiveAppBar() {
     setAnchorElNav(null);
   };
 
+  const handleOpenWalletMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElWallet(event.currentTarget);
+  };
+
+  const handleCloseWalletMenu = () => {
+    setAnchorElWallet(null);
+  };
+
+  const handleDisconnectWallet = () => {
+    disconnectWallet();
+    handleCloseWalletMenu();
+  };
+
   const handlePageClick = (page: string) => {
     if (page === "Documentation") {
       window.location.href = "https://docs.web3db.org/docs/intro";
     }
     if (page === "Demo") {
-      window.location.href = "http://129.74.152.201:8000/docs#";
+      if (isConnected) {
+        // If already connected, go directly to the query page
+        navigate("/run-query");
+      } else {
+        // If not connected, show MetaMask modal
+        setIsMetaMaskModalOpen(true);
+      }
+    }
+    if (page === "Home") {
+      navigate("/");
     }
     // Handle other page navigations if necessary
     handleCloseNavMenu();
+  };
+
+  const handleMetaMaskSuccess = () => {
+    setIsMetaMaskModalOpen(false);
+    // Navigate to the demo/query page after successful connection
+    navigate("/run-query");
   };
 
   return (
@@ -48,7 +83,7 @@ function ResponsiveAppBar() {
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            onClick={() => navigate("/")}
             sx={{
               mr: 3,
               display: { xs: "none", md: "flex" },
@@ -57,6 +92,10 @@ function ResponsiveAppBar() {
               letterSpacing: ".3rem",
               color: "inherit",
               textDecoration: "none",
+              cursor: "pointer",
+              "&:hover": {
+                opacity: 0.8
+              }
             }}
           >
             WEB3DB
@@ -103,7 +142,7 @@ function ResponsiveAppBar() {
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            onClick={() => navigate("/")}
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
@@ -113,6 +152,10 @@ function ResponsiveAppBar() {
               letterSpacing: ".3rem",
               color: "inherit",
               textDecoration: "none",
+              cursor: "pointer",
+              "&:hover": {
+                opacity: 0.8
+              }
             }}
           >
             WEB3DB
@@ -128,8 +171,62 @@ function ResponsiveAppBar() {
               </Button>
             ))}
           </Box>
+
+          {/* Wallet Status */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+            {isConnected ? (
+              <>
+                <Chip
+                  icon={<AccountBalanceWalletIcon />}
+                  label={`${account?.slice(0, 6)}...${account?.slice(-4)}`}
+                  variant="outlined"
+                  onClick={handleOpenWalletMenu}
+                  sx={{ 
+                    color: "white", 
+                    borderColor: "white",
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "rgba(255, 255, 255, 0.1)"
+                    }
+                  }}
+                />
+                <Menu
+                  anchorEl={anchorElWallet}
+                  open={Boolean(anchorElWallet)}
+                  onClose={handleCloseWalletMenu}
+                >
+                  <MenuItem onClick={handleDisconnectWallet}>
+                    Disconnect Wallet
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <Button
+                onClick={() => setIsMetaMaskModalOpen(true)}
+                variant="outlined"
+                startIcon={<AccountBalanceWalletIcon />}
+                sx={{ 
+                  color: "white", 
+                  borderColor: "white",
+                  "&:hover": {
+                    borderColor: "white",
+                    backgroundColor: "rgba(255, 255, 255, 0.1)"
+                  }
+                }}
+              >
+                Connect Wallet
+              </Button>
+            )}
+          </Box>
         </Toolbar>
       </Container>
+      
+      <MetaMaskModal
+        open={isMetaMaskModalOpen}
+        onClose={() => setIsMetaMaskModalOpen(false)}
+        onSuccess={handleMetaMaskSuccess}
+        onDisconnect={() => setIsMetaMaskModalOpen(false)}
+      />
     </AppBar>
   );
 }

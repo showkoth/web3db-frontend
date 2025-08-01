@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   SideBarContainer,
   MenuTitle,
@@ -21,6 +21,14 @@ const SideBar: React.FC<{ isOpen: boolean; toggleSidebar: () => void }> = ({
         </CloseButton>
         <MenuTitle>Menu</MenuTitle>
         <NavList>
+          <NavItem>
+            <StyledNavLink
+              to="/"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Home
+            </StyledNavLink>
+          </NavItem>
           <NavItem>
             <StyledNavLink
               to="/tables"

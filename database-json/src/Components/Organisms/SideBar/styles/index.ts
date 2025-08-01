@@ -1,21 +1,19 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
-interface SideBarProps {
-  isOpen: boolean;
-}
 export const SideBarContainer = styled.div.withConfig({
   shouldForwardProp: (prop) => !["isOpen"].includes(prop),
 })<{ isOpen: boolean }>`
   position: fixed;
-  top: 0;
+  top: 70px; /* Position below the navbar */
   left: ${({ isOpen }) => (isOpen ? "0" : "-250px")};
-  height: 100%;
+  height: calc(100% - 70px); /* Adjust height to account for navbar */
   width: 250px;
   background-color: #343a40;
   color: white;
   padding: 20px;
   overflow-y: auto;
   transition: left 0.3s;
+  z-index: 1050; /* Below navbar but above other content */
 `;
 
 export const CloseButton = styled.button`
@@ -31,7 +29,7 @@ export const CloseButton = styled.button`
 
 export const ToggleSidebarButton = styled.button`
   position: fixed;
-  top: 10px;
+  top: 80px; /* Position below the navbar */
   left: 0;
   background: rgba(255, 255, 255, 0.8); // Semi-transparent white
   color: #343a40; // Dark text to contrast the light background
@@ -40,6 +38,7 @@ export const ToggleSidebarButton = styled.button`
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); // A subtle shadow to lift the button a bit
   border-radius: 0 10px 10px 0; // Rounded edges on the right side for aesthetics
+  z-index: 1050;
 `;
 
 export const MenuTitle = styled.h5`
