@@ -74,7 +74,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Web3DB. Built By Gustavo Aniceto.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Web3DB. Maintained by Showkot Hossain.`,
     },
     prism: {
       theme: prismThemes.github,
