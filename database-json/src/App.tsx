@@ -16,12 +16,14 @@ import LandingPage from "./Components/Pages/LandingPage";
 interface MainLayoutProps {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
+  children: React.ReactNode;
 }
 
 // Layout component with sidebar and navbar
 const MainLayout: React.FC<MainLayoutProps> = ({
   toggleSidebar,
   isSidebarOpen,
+  children,
 }) => {
   const ContentContainer = styled.div`
     margin-left: ${isSidebarOpen ? "250px" : "0"};
@@ -46,11 +48,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       </NavBarContainer>
       <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <ContentContainer>
-        <Routes>
-          <Route path="/run-query" element={<RunQuery />} />
-          <Route path="/see-table" element={<SeeTables />} />
-          <Route path="*" element={<RunQuery />} />
-        </Routes>
+        {children}
       </ContentContainer>
     </>
   );
@@ -76,7 +74,9 @@ function App() {
                   <MainLayout
                     toggleSidebar={toggleSidebar}
                     isSidebarOpen={isSidebarOpen}
-                  />
+                  >
+                    <RunQuery />
+                  </MainLayout>
                 } 
               />
               <Route 
@@ -85,7 +85,9 @@ function App() {
                   <MainLayout
                     toggleSidebar={toggleSidebar}
                     isSidebarOpen={isSidebarOpen}
-                  />
+                  >
+                    <SeeTables />
+                  </MainLayout>
                 } 
               />
               <Route
@@ -94,7 +96,9 @@ function App() {
                   <MainLayout
                     toggleSidebar={toggleSidebar}
                     isSidebarOpen={isSidebarOpen}
-                  />
+                  >
+                    <RunQuery />
+                  </MainLayout>
                 }
               />
             </Routes>

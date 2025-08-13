@@ -1,4 +1,5 @@
-import React, { createContext, useState, ReactNode } from "react";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import React, { createContext, useState, ReactNode, useCallback } from "react";
 
 type SqlState = {
   query: string;
@@ -6,6 +7,9 @@ type SqlState = {
   runQuery: (query: string, indexAttribute: string) => void;
   message: string | null;
   error: string | null;
+  schemas: any;
+  fetchSchemas: () => void;
+  schemasLoading: boolean;
 };
 
 const initialContext: Partial<SqlState> = {
@@ -14,6 +18,9 @@ const initialContext: Partial<SqlState> = {
   runQuery: () => {},
   message: null,
   error: null,
+  schemas: null,
+  fetchSchemas: () => {},
+  schemasLoading: false,
 };
 
 export const SqlContext = createContext<Partial<SqlState>>(initialContext);
@@ -27,6 +34,8 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
   const [results, setResults] = useState<any>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [schemas, setSchemas] = useState<any>(null);
+  const [schemasLoading, setSchemasLoading] = useState<boolean>(false);
 
   const runQuery = async (
     sqlQuery: string,
@@ -88,9 +97,52 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
     }
   };
 
+  const fetchSchemas = useCallback(async () => {
+    setSchemasLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        "http://129.74.152.201:8000/schemas",
+        {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+          },
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Schemas API Response:", data);
+
+      setSchemas(data);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching schemas:", err);
+
+      if (err instanceof Error) {
+        if (err.message.includes("Failed to fetch") || err.message.includes("CORS")) {
+          setError("CORS error: Unable to connect to the API. Please ensure the API server has CORS enabled for localhost:3000");
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("An unknown error occurred while fetching schemas");
+      }
+      
+      setSchemas(null);
+    } finally {
+      setSchemasLoading(false);
+    }
+  }, []);
+
   return (
     <SqlContext.Provider
-      value={{ query, results, runQuery, message, error }}
+      value={{ query, results, runQuery, message, error, schemas, fetchSchemas, schemasLoading }}
     >
       {children}
     </SqlContext.Provider>
