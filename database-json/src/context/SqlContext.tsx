@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { createContext, useState, ReactNode, useCallback } from "react";
 import { config, buildApiUrl } from "../config/config";
+import { useWeb3 } from "./Web3Context";
 
 type SqlState = {
   query: string;
@@ -37,6 +38,9 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const [schemas, setSchemas] = useState<any>(null);
   const [schemasLoading, setSchemasLoading] = useState<boolean>(false);
+  
+  // Get wallet address from Web3Context
+  const { account } = useWeb3();
 
   const runQuery = async (
     sqlQuery: string,
@@ -50,6 +54,7 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
     const requestBody = {
       index_attribute: indexAttribute,
       query: sqlQuery,
+      wallet_address: account || config.DEFAULT_WALLET_ADDRESS,
     };
 
     try {
