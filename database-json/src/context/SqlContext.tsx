@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { createContext, useState, ReactNode, useCallback } from "react";
+import { config, buildApiUrl } from "../config/config";
 
 type SqlState = {
   query: string;
@@ -53,14 +54,11 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
 
     try {
       const response = await fetch(
-        "http://129.74.152.201:8000/query",
+        buildApiUrl(config.ENDPOINTS.QUERY),
         {
           method: "POST",
           body: JSON.stringify(requestBody),
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-          },
+          headers: config.REQUEST_CONFIG.HEADERS,
         }
       );
       
@@ -103,7 +101,7 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
 
     try {
       const response = await fetch(
-        "http://129.74.152.201:8000/schemas",
+        buildApiUrl(config.ENDPOINTS.SCHEMAS),
         {
           method: "GET",
           headers: {

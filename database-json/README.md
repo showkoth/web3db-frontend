@@ -2,6 +2,22 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Configuration
+
+Before running the application, you need to configure the backend API URL:
+
+1. Copy the environment template:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit the `.env` file and update the `REACT_APP_API_BASE_URL` with your backend server URL:
+   ```
+   REACT_APP_API_BASE_URL=http://129.74.154.215:8000
+   ```
+
+The application will use the environment variable if available, or fall back to the default URL configured in `src/config/config.ts`.
+
 ## Available Scripts
 
 In the project directory, you can run:
