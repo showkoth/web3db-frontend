@@ -630,7 +630,7 @@ const LandingPage: React.FC = () => {
                   100%
                 </Typography>
                 <Typography variant="body1" sx={{ color: "rgba(255, 255, 255, 0.8)" }}>
-                  Decentralized
+                  Decentralized Storage
                 </Typography>
               </Box>
             </Grid>
