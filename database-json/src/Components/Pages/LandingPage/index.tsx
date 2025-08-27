@@ -166,62 +166,159 @@ const LandingPage: React.FC = () => {
           <Box
             sx={{
               position: "absolute",
-              top: "20%",
-              left: "15%",
-              maxWidth: "35%",
+              top: "18%",
+              left: "8%",
+              maxWidth: "45%",
               zIndex: 2,
               color: "white",
               pointerEvents: "none",
             }}
           >
             <Typography
-              variant="h2"
+              variant="h1"
               component="h1"
               gutterBottom
               sx={{
                 fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".5rem",
+                fontWeight: 800,
+                letterSpacing: ".4rem",
                 color: "inherit",
                 textAlign: "left",
+                fontSize: { xs: "2.5rem", md: "3.5rem", lg: "4rem" },
+                background: "linear-gradient(45deg, #00D4FF, #4CAF50, #FF9800)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                textShadow: "0 0 30px rgba(0, 212, 255, 0.5)",
+                mb: 2
               }}
             >
               WEB3DB.ORG
             </Typography>
+            
             <Typography
               variant="h4"
               component="h2"
               gutterBottom
               sx={{ 
                 textAlign: "left",
-                lineHeight: 1.3,
-                mb: 3
+                lineHeight: 1.2,
+                mb: 3,
+                fontSize: { xs: "1.5rem", md: "2rem", lg: "2.5rem" },
+                fontWeight: 600,
+                color: "#E0E0E0"
               }}
             >
               Decentralized Zero-Trust Computing and Storage
             </Typography>
+
             <Typography
               variant="h6"
               gutterBottom
               sx={{ 
-                my: 6, 
+                my: 4, 
                 textAlign: "left",
-                lineHeight: 1.6,
-                maxWidth: "95%"
+                lineHeight: 1.7,
+                maxWidth: "90%",
+                fontSize: { xs: "1rem", md: "1.1rem", lg: "1.25rem" },
+                color: "rgba(255, 255, 255, 0.9)",
+                fontWeight: 400
               }}
             >
               The core vision behind Web3DB is to restore data ownership to individuals, empowering them with fine-grained access control, secure query processing, and safe data sharing. By leveraging blockchain, IPFS, and trusted execution environments (TEEs), we are building a decentralized, unified relational database network that anyone can join and contribute to.
             </Typography>
-            <Button
-              variant="contained"
-              onClick={handleDemoClick}
-              sx={{
-                pointerEvents: "auto",
-                alignSelf: "flex-start",
-              }}
-            >
-              Try Demo
-            </Button>
+
+            {/* Key Features Highlights */}
+            <Box sx={{ 
+              display: "flex", 
+              gap: 3, 
+              mb: 4, 
+              flexWrap: "wrap",
+              pointerEvents: "none"
+            }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography sx={{ fontSize: "1.5rem" }}>🔒</Typography>
+                <Typography sx={{ 
+                  color: "#00D4FF", 
+                  fontWeight: 600,
+                  fontSize: { xs: "0.9rem", md: "1rem" }
+                }}>
+                  Zero-Trust Security
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography sx={{ fontSize: "1.5rem" }}>🌐</Typography>
+                <Typography sx={{ 
+                  color: "#4CAF50", 
+                  fontWeight: 600,
+                  fontSize: { xs: "0.9rem", md: "1rem" }
+                }}>
+                  Blockchain Powered
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography sx={{ fontSize: "1.5rem" }}>⚡</Typography>
+                <Typography sx={{ 
+                  color: "#FF9800", 
+                  fontWeight: 600,
+                  fontSize: { xs: "0.9rem", md: "1rem" }
+                }}>
+                  SQL Interface
+                </Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+              <Button
+                variant="contained"
+                onClick={handleDemoClick}
+                size="large"
+                sx={{
+                  pointerEvents: "auto",
+                  px: 4,
+                  py: 1.5,
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  background: "linear-gradient(45deg, #00D4FF 30%, #4CAF50 90%)",
+                  border: "none",
+                  borderRadius: 2,
+                  boxShadow: "0 8px 25px rgba(0, 212, 255, 0.3)",
+                  textTransform: "none",
+                  "&:hover": {
+                    background: "linear-gradient(45deg, #0099CC 30%, #2E7D32 90%)",
+                    transform: "translateY(-3px)",
+                    boxShadow: "0 12px 35px rgba(0, 212, 255, 0.4)"
+                  },
+                  transition: "all 0.3s ease"
+                }}
+              >
+                🚀 Try Demo
+              </Button>
+              
+              <Button
+                variant="outlined"
+                onClick={() => window.location.href = "https://docs.web3db.org/docs/intro"}
+                size="large"
+                sx={{
+                  pointerEvents: "auto",
+                  px: 3,
+                  py: 1.5,
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                  color: "white",
+                  borderColor: "rgba(255, 255, 255, 0.3)",
+                  borderRadius: 2,
+                  textTransform: "none",
+                  "&:hover": {
+                    borderColor: "white",
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    transform: "translateY(-2px)"
+                  },
+                  transition: "all 0.3s ease"
+                }}
+              >
+                📖 Documentation
+              </Button>
+            </Box>
           </Box>
         </Box>
       )}
@@ -230,50 +327,134 @@ const LandingPage: React.FC = () => {
       {isMobile && (
         <Container sx={{ py: 8, textAlign: "center" }}>
           <Typography
-            variant="h3"
+            variant="h2"
             component="h1"
             gutterBottom
             sx={{
               fontFamily: "monospace",
-              fontWeight: 700,
+              fontWeight: 800,
               letterSpacing: ".3rem",
-              color: "white",
-              fontSize: { xs: "2rem", sm: "2.5rem" }
+              fontSize: { xs: "2rem", sm: "2.5rem" },
+              background: "linear-gradient(45deg, #00D4FF, #4CAF50, #FF9800)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              mb: 2
             }}
           >
             WEB3DB.ORG
           </Typography>
+          
           <Typography
-            variant="h5"
+            variant="h4"
             component="h2"
             gutterBottom
             sx={{ 
-              color: "white",
+              color: "#E0E0E0",
               mb: 3,
               lineHeight: 1.3,
-              fontSize: { xs: "1.25rem", sm: "1.5rem" }
+              fontSize: { xs: "1.25rem", sm: "1.5rem" },
+              fontWeight: 600
             }}
           >
             Decentralized Zero-Trust Computing and Storage
           </Typography>
+
+          {/* Mobile Feature Highlights */}
+          <Box sx={{ 
+            display: "flex", 
+            justifyContent: "center",
+            gap: 2, 
+            mb: 4, 
+            flexWrap: "wrap"
+          }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Typography sx={{ fontSize: "1.2rem" }}>🔒</Typography>
+              <Typography sx={{ 
+                color: "#00D4FF", 
+                fontWeight: 600,
+                fontSize: "0.85rem"
+              }}>
+                Secure
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Typography sx={{ fontSize: "1.2rem" }}>🌐</Typography>
+              <Typography sx={{ 
+                color: "#4CAF50", 
+                fontWeight: 600,
+                fontSize: "0.85rem"
+              }}>
+                Decentralized
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Typography sx={{ fontSize: "1.2rem" }}>⚡</Typography>
+              <Typography sx={{ 
+                color: "#FF9800", 
+                fontWeight: 600,
+                fontSize: "0.85rem"
+              }}>
+                Fast
+              </Typography>
+            </Box>
+          </Box>
+          
           <Typography
             variant="body1"
             sx={{ 
-              color: "white",
+              color: "rgba(255, 255, 255, 0.9)",
               mb: 4,
               lineHeight: 1.6,
-              textAlign: "justify"
+              textAlign: "justify",
+              fontSize: { xs: "0.95rem", sm: "1rem" }
             }}
           >
             The core vision behind Web3DB is to restore data ownership to individuals, empowering them with fine-grained access control, secure query processing, and safe data sharing. By leveraging blockchain, IPFS, and trusted execution environments (TEEs), we are building a decentralized, unified relational database network that anyone can join and contribute to.
           </Typography>
-          <Button
-            variant="contained"
-            onClick={handleDemoClick}
-            size="large"
-          >
-            Try Demo
-          </Button>
+          
+          <Box sx={{ display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
+            <Button
+              variant="contained"
+              onClick={handleDemoClick}
+              size="large"
+              sx={{
+                px: 4,
+                py: 1.5,
+                fontSize: "1rem",
+                fontWeight: 600,
+                background: "linear-gradient(45deg, #00D4FF 30%, #4CAF50 90%)",
+                borderRadius: 2,
+                textTransform: "none",
+                "&:hover": {
+                  background: "linear-gradient(45deg, #0099CC 30%, #2E7D32 90%)",
+                  transform: "translateY(-2px)"
+                }
+              }}
+            >
+              🚀 Try Demo
+            </Button>
+            
+            <Button
+              variant="outlined"
+              onClick={() => window.location.href = "https://docs.web3db.org/docs/intro"}
+              sx={{
+                px: 3,
+                py: 1.5,
+                fontSize: "0.9rem",
+                color: "white",
+                borderColor: "rgba(255, 255, 255, 0.3)",
+                borderRadius: 2,
+                textTransform: "none",
+                "&:hover": {
+                  borderColor: "white",
+                  backgroundColor: "rgba(255, 255, 255, 0.1)"
+                }
+              }}
+            >
+              📖 Docs
+            </Button>
+          </Box>
         </Container>
       )}
 
