@@ -137,7 +137,7 @@ function ResponsiveAppBar() {
               ))}
             </Menu>
           </Box>
-          <Web3DBLogo sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} size={28} />
+          <Web3DBLogo sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} size={36} />
           <Typography
             variant="h5"
             noWrap
