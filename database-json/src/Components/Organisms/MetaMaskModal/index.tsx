@@ -10,9 +10,7 @@ import {
   Alert,
   CircularProgress,
   IconButton,
-  Avatar,
   Chip,
-  Divider,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -110,11 +108,11 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
                 justifyContent: 'center',
                 mx: 'auto',
                 mb: 3,
-                animation: 'pulse 2s infinite',
-                '@keyframes pulse': {
-                  '0%': { transform: 'scale(1)', boxShadow: '0 0 20px rgba(0, 212, 255, 0.4)' },
-                  '50%': { transform: 'scale(1.05)', boxShadow: '0 0 30px rgba(0, 212, 255, 0.6)' },
-                  '100%': { transform: 'scale(1)', boxShadow: '0 0 20px rgba(0, 212, 255, 0.4)' }
+                boxShadow: '0 0 20px rgba(0, 212, 255, 0.4)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 0 30px rgba(0, 212, 255, 0.6)'
                 }
               }}
             >
