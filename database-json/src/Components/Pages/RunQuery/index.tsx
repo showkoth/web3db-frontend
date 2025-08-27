@@ -1,5 +1,38 @@
 import React, { useContext, useState } from "react";
-import { Row, Col, Table, Form, Alert, Pagination } from "react-bootstrap";
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  Alert,
+  Chip,
+  Card,
+  CardContent,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  IconButton,
+  Tooltip,
+  LinearProgress,
+  Divider,
+  ButtonGroup,
+  Stack,
+} from "@mui/material";
+import {
+  PlayArrow as PlayIcon,
+  ContentCopy as CopyIcon,
+  GetApp as ExportIcon,
+  History as HistoryIcon,
+  Help as HelpIcon,
+  Storage as DatabaseIcon,
+  Speed as OptimizeIcon,
+} from "@mui/icons-material";
 import AceEditor from "react-ace";
 import "brace/mode/sql";
 import "brace/theme/tomorrow_night_eighties";
@@ -8,7 +41,6 @@ import "brace/ext/searchbox";
 import { SqlContext } from "../../../context/SqlContext";
 import { useWeb3 } from "../../../context/Web3Context";
 import MetaMaskModal from "../../Organisms/MetaMaskModal";
-import { QueryContainer, StyledButton } from "./styles";
 import ace from "ace-builds/src-noconflict/ace";
 interface ResultRow {
   [key: string]: any;
@@ -29,10 +61,11 @@ const RunQuery: React.FC = () => {
   const [inputQuery, setInputQuery] = useState<string>("SELECT * FROM patient_data WHERE PatientID = '38'");
   const [indexAttribute, setIndexAttribute] = useState<string>("PatientID");
   const [isMetaMaskModalOpen, setIsMetaMaskModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Pagination state
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleInputChange = (newValue: string) => {
     const transformedValue = capitalizeSQLKeywords(newValue);
@@ -43,12 +76,16 @@ const RunQuery: React.FC = () => {
     setIndexAttribute(event.target.value);
   };
 
-  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setRowsPerPage(Number(event.target.value));
-    setCurrentPage(1); // Reset to first page when changing rows per page
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
   };
 
-  const handleRunQuery = () => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleRunQuery = async () => {
     // Check if wallet is connected
     if (!isConnected) {
       setIsMetaMaskModalOpen(true);
@@ -66,27 +103,50 @@ const RunQuery: React.FC = () => {
     }
 
     // Reset pagination when running a new query
-    setCurrentPage(1);
+    setPage(0);
+    setIsLoading(true);
 
-    // Check if runQuery is defined
-    if (runQuery) {
-      runQuery(inputQuery, indexAttribute);
-    } else {
-      console.error("runQuery function is undefined");
-      // Handle the error as needed
+    try {
+      // Check if runQuery is defined
+      if (runQuery) {
+        await runQuery(inputQuery, indexAttribute);
+      } else {
+        console.error("runQuery function is undefined");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleMetaMaskSuccess = () => {
     setIsMetaMaskModalOpen(false);
-    // Optionally auto-run the query after connection
+  };
+
+  const handleCopyQuery = () => {
+    navigator.clipboard.writeText(inputQuery);
   };
 
   const exampleQueries = [
-    "SELECT * FROM patient_data WHERE PatientID = '38'",
-    "SELECT * FROM patient_data LIMIT 10",
-    "SELECT PatientID, Age, Gender FROM patient_data",
-    "SELECT COUNT(*) FROM patient_data",
+    {
+      label: "Get Patient by ID",
+      query: "SELECT * FROM patient_data WHERE PatientID = '38'",
+      description: "Retrieve specific patient data"
+    },
+    {
+      label: "Limited Results",
+      query: "SELECT * FROM patient_data LIMIT 10",
+      description: "Get first 10 patients"
+    },
+    {
+      label: "Basic Columns",
+      query: "SELECT PatientID, Age, Gender FROM patient_data",
+      description: "Select specific columns"
+    },
+    {
+      label: "Count Records",
+      query: "SELECT COUNT(*) FROM patient_data",
+      description: "Count total patients"
+    },
   ];
 
   const handleLoadExample = (exampleQuery: string) => {
@@ -96,110 +156,71 @@ const RunQuery: React.FC = () => {
     if (results && results.length > 0) {
       const columns = Object.keys(results[0]);
       
-      // Calculate pagination
-      const totalPages = Math.ceil(results.length / rowsPerPage);
-      const startIndex = (currentPage - 1) * rowsPerPage;
-      const endIndex = startIndex + rowsPerPage;
-      const currentPageData = results.slice(startIndex, endIndex);
-      
       return (
-        <div>
-          {/* Results info and rows per page selector */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <strong>
-                Showing {startIndex + 1}-{Math.min(endIndex, results.length)} of {results.length} results
-              </strong>
-            </div>
-            <div className="d-flex align-items-center">
-              <span className="me-2">Rows per page:</span>
-              <Form.Select 
-                size="sm" 
-                style={{ width: 'auto' }}
-                value={rowsPerPage}
-                onChange={handleRowsPerPageChange}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </Form.Select>
-            </div>
-          </div>
-          
-          {/* Table */}
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                {columns.map((col, index) => (
-                  <th key={index}>{col}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentPageData.map((row: ResultRow, rowIndex: number) => (
-                <tr key={startIndex + rowIndex}>
-                  {columns.map((col, colIndex) => (
-                    <td key={colIndex}>{row[col]}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-          
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="d-flex justify-content-center mt-3">
-              <Pagination>
-                <Pagination.First 
-                  onClick={() => setCurrentPage(1)}
-                  disabled={currentPage === 1}
-                />
-                <Pagination.Prev 
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                />
-                
-                {/* Page numbers */}
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  let pageNum: number;
-                  if (totalPages <= 5) {
-                    pageNum = i + 1;
-                  } else if (currentPage <= 3) {
-                    pageNum = i + 1;
-                  } else if (currentPage >= totalPages - 2) {
-                    pageNum = totalPages - 4 + i;
-                  } else {
-                    pageNum = currentPage - 2 + i;
-                  }
-                  
-                  return (
-                    <Pagination.Item
-                      key={pageNum}
-                      active={pageNum === currentPage}
-                      onClick={() => setCurrentPage(pageNum)}
+        <Paper sx={{ width: '100%', mb: 2, borderRadius: 2, overflow: 'hidden' }}>
+          <TableContainer>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column}
+                      sx={{
+                        fontWeight: 700,
+                        backgroundColor: '#f5f5f5',
+                        color: '#333',
+                        borderBottom: '2px solid #e0e0e0'
+                      }}
                     >
-                      {pageNum}
-                    </Pagination.Item>
-                  );
-                })}
-                
-                <Pagination.Next 
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                />
-                <Pagination.Last 
-                  onClick={() => setCurrentPage(totalPages)}
-                  disabled={currentPage === totalPages}
-                />
-              </Pagination>
-            </div>
-          )}
-        </div>
+                      {column}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {results
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row: ResultRow, index: number) => (
+                    <TableRow
+                      key={index}
+                      hover
+                      sx={{
+                        '&:nth-of-type(odd)': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                        },
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 212, 255, 0.08)',
+                        },
+                      }}
+                    >
+                      {columns.map((column) => (
+                        <TableCell key={column} sx={{ py: 1.5 }}>
+                          {row[column]}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25, 50]}
+            component="div"
+            count={results.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{ borderTop: '1px solid #e0e0e0' }}
+          />
+        </Paper>
       );
     } else if (message) {
-      return <p>{message}</p>;
+      return (
+        <Alert severity="info" sx={{ borderRadius: 2, mb: 2 }}>
+          {message}
+        </Alert>
+      );
     }
     return null;
   };
@@ -301,106 +322,281 @@ const RunQuery: React.FC = () => {
   // Inside your RunQuery component
 
   return (
-    <QueryContainer>
-      {/* Wallet Connection Status */}
-      <Row className="mb-3">
-        <Col xs={12}>
-          {isConnected ? (
-            <Alert variant="success">
-              <strong>Wallet Connected:</strong> {account?.slice(0, 6)}...{account?.slice(-4)}
-            </Alert>
-          ) : (
-            <Alert variant="warning">
-              <strong>Wallet Not Connected:</strong> Please connect your MetaMask wallet to run queries.
+    <Box sx={{ p: 4, minHeight: '100vh', bgcolor: '#f8f9fa' }}>
+      {/* Header Section */}
+      <Box sx={{ mb: 4 }}>
+        <Typography 
+          variant="h3" 
+          fontWeight={700} 
+          sx={{ 
+            mb: 2, 
+            color: '#1a1a1a',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2
+          }}
+        >
+          <DatabaseIcon sx={{ fontSize: 40, color: '#00D4FF' }} />
+          Universal Query Interface
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          Execute SQL queries on the Web3DB decentralized database with your connected wallet.
+        </Typography>
+
+        {/* Wallet Status */}
+        {isConnected ? (
+          <Alert 
+            severity="success" 
+            sx={{ 
+              borderRadius: 2,
+              backgroundColor: 'rgba(76, 175, 80, 0.1)',
+              border: '1px solid rgba(76, 175, 80, 0.3)',
+              mb: 3
+            }}
+          >
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Box>
+                <Typography variant="body1" fontWeight={600}>
+                  🟢 Wallet Connected
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {account?.slice(0, 8)}...{account?.slice(-6)}
+                </Typography>
+              </Box>
+            </Stack>
+          </Alert>
+        ) : (
+          <Alert 
+            severity="warning"
+            sx={{ 
+              borderRadius: 2,
+              backgroundColor: 'rgba(255, 193, 7, 0.1)',
+              border: '1px solid rgba(255, 193, 7, 0.3)',
+              mb: 3
+            }}
+          >
+            <Typography variant="body1" fontWeight={600}>
+              ⚠️ Wallet Not Connected
+            </Typography>
+            <Typography variant="body2">
+              Please connect your MetaMask wallet to run queries.
+            </Typography>
+          </Alert>
+        )}
+      </Box>
+
+      <Grid container spacing={3}>
+        {/* Query Editor Section */}
+        <Grid item xs={12} lg={8}>
+          <Card sx={{ mb: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <PlayIcon sx={{ color: '#00D4FF' }} />
+                  Query Editor
+                </Typography>
+                <Stack direction="row" spacing={1}>
+                  <Tooltip title="Copy Query">
+                    <IconButton onClick={handleCopyQuery} size="small">
+                      <CopyIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Help">
+                    <IconButton size="small">
+                      <HelpIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              </Box>
+
+              <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, overflow: 'hidden', mb: 3 }}>
+                <AceEditor
+                  mode="sql"
+                  theme="tomorrow_night_eighties"
+                  value={inputQuery}
+                  onChange={handleInputChange}
+                  name="SQL_EDITOR"
+                  editorProps={{ $blockScrolling: true }}
+                  width="100%"
+                  height="250px"
+                  fontSize={14}
+                  showPrintMargin={true}
+                  showGutter={true}
+                  highlightActiveLine={true}
+                  setOptions={{
+                    enableBasicAutocompletion: true,
+                    enableLiveAutocompletion: true,
+                    enableSnippets: true,
+                    showLineNumbers: true,
+                    tabSize: 4,
+                  }}
+                  placeholder="Enter your SQL query here..."
+                />
+              </Box>
+
+              {/* Index Attribute */}
+              <TextField
+                fullWidth
+                label="Index Attribute"
+                value={indexAttribute}
+                onChange={handleIndexAttributeChange}
+                helperText="Index attribute for query optimization (e.g., PatientID)"
+                variant="outlined"
+                sx={{ mb: 3 }}
+                InputProps={{
+                  startAdornment: <OptimizeIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                }}
+              />
+
+              {/* Action Buttons */}
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={handleRunQuery}
+                  disabled={!isConnected || isLoading}
+                  startIcon={isLoading ? <LinearProgress /> : <PlayIcon />}
+                  sx={{
+                    background: 'linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)',
+                    color: 'white',
+                    fontWeight: 700,
+                    px: 4,
+                    py: 1.5,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontSize: '1.1rem',
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #00B8E6 0%, #0088BB 100%)',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 8px 25px rgba(0, 212, 255, 0.3)'
+                    },
+                    '&:disabled': {
+                      background: 'rgba(0, 0, 0, 0.12)',
+                      color: 'rgba(0, 0, 0, 0.26)'
+                    }
+                  }}
+                >
+                  {isLoading ? 'Running Query...' : !isConnected ? 'Connect Wallet First' : 'Run Query'}
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  startIcon={<ExportIcon />}
+                  disabled={!results || results.length === 0}
+                  sx={{ 
+                    borderColor: '#00D4FF', 
+                    color: '#00D4FF',
+                    textTransform: 'none',
+                    '&:hover': {
+                      borderColor: '#00B8E6',
+                      backgroundColor: 'rgba(0, 212, 255, 0.1)'
+                    }
+                  }}
+                >
+                  Export Results
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Example Queries Section */}
+        <Grid item xs={12} lg={4}>
+          <Card sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <HistoryIcon sx={{ color: '#4CAF50' }} />
+                Example Queries
+              </Typography>
+              
+              <Stack spacing={2}>
+                {exampleQueries.map((example, index) => (
+                  <Card 
+                    key={index}
+                    variant="outlined"
+                    sx={{ 
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        boxShadow: '0 4px 12px rgba(0, 212, 255, 0.2)',
+                        borderColor: '#00D4FF'
+                      }
+                    }}
+                    onClick={() => handleLoadExample(example.query)}
+                  >
+                    <CardContent sx={{ p: 2 }}>
+                      <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                        {example.label}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        {example.description}
+                      </Typography>
+                      <Chip
+                        label={example.query.length > 40 ? `${example.query.substring(0, 40)}...` : example.query}
+                        size="small"
+                        sx={{ 
+                          fontFamily: 'monospace',
+                          backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                          color: '#0088CC'
+                        }}
+                      />
+                    </CardContent>
+                  </Card>
+                ))}
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Results Section */}
+        <Grid item xs={12}>
+          {isLoading && (
+            <Box sx={{ mb: 2 }}>
+              <LinearProgress sx={{ borderRadius: 1, height: 6 }} />
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
+                Executing query on Web3DB...
+              </Typography>
+            </Box>
+          )}
+
+          {sqlError && (
+            <Alert 
+              severity="error" 
+              sx={{ 
+                borderRadius: 2, 
+                mb: 3,
+                backgroundColor: 'rgba(255, 87, 87, 0.1)',
+                border: '1px solid rgba(255, 87, 87, 0.3)'
+              }}
+            >
+              <Typography variant="body1" fontWeight={600}>
+                Query Error
+              </Typography>
+              <Typography variant="body2">
+                {sqlError}
+              </Typography>
             </Alert>
           )}
-        </Col>
-      </Row>
 
-      <Row className="mb-4">
-        <Col xs={12}>
-          <AceEditor
-            mode="sql"
-            theme="tomorrow_night_eighties"
-            value={inputQuery}
-            onChange={handleInputChange}
-            name="SQL_EDITOR"
-            editorProps={{ $blockScrolling: true }}
-            width="100%"
-            height="250px"
-            fontSize={14}
-            showPrintMargin={true}
-            showGutter={true}
-            highlightActiveLine={true}
-            setOptions={{
-              enableBasicAutocompletion: true,
-              enableLiveAutocompletion: true,
-              enableSnippets: true,
-              showLineNumbers: true,
-              tabSize: 4,
-            }}
-            placeholder="Enter your SQL query here..."
-          />
-        </Col>
-      </Row>
-
-      {/* Example Queries */}
-      <Row className="mb-3">
-        <Col xs={12}>
-          <div className="mb-2">
-            <strong>Example Queries:</strong>
-          </div>
-          {exampleQueries.map((query, index) => (
-            <button
-              key={index}
-              className="btn btn-outline-secondary btn-sm me-2 mb-2"
-              onClick={() => handleLoadExample(query)}
-              style={{ fontSize: '12px' }}
-            >
-              {query.length > 50 ? `${query.substring(0, 50)}...` : query}
-            </button>
-          ))}
-        </Col>
-      </Row>
-      <Row className="mb-4">
-        <Col xs={12}>
-          <Form.Control
-            type="text"
-            placeholder="Enter index attribute (e.g., PatientID)"
-            value={indexAttribute}
-            onChange={handleIndexAttributeChange}
-          />
-          <Form.Text className="text-muted">
-            Index attribute for query optimization
-          </Form.Text>
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={12}>
-          <StyledButton 
-            variant="secondary" 
-            onClick={handleRunQuery}
-            disabled={!isConnected}
-          >
-            {isConnected ? "Run Query" : "Connect Wallet to Run Query"}
-          </StyledButton>
-        </Col>
-      </Row>
-      
-      {/* Error Display */}
-      {sqlError && (
-        <Row className="mt-3">
-          <Col xs={12}>
-            <Alert variant="danger">
-              <strong>Error:</strong> {sqlError}
-            </Alert>
-          </Col>
-        </Row>
-      )}
-      
-      <Row>
-        <Col xs={12}>{renderTable()}</Col>
-      </Row>
+          {results && results.length > 0 && (
+            <Card sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" fontWeight={600}>
+                    Query Results
+                  </Typography>
+                  <Chip
+                    label={`${results.length} ${results.length === 1 ? 'record' : 'records'} found`}
+                    color="success"
+                    variant="outlined"
+                  />
+                </Box>
+                {renderTable()}
+              </CardContent>
+            </Card>
+          )}
+        </Grid>
+      </Grid>
 
       {/* MetaMask Modal */}
       <MetaMaskModal
@@ -409,7 +605,7 @@ const RunQuery: React.FC = () => {
         onSuccess={handleMetaMaskSuccess}
         onDisconnect={() => setIsMetaMaskModalOpen(false)}
       />
-    </QueryContainer>
+    </Box>
   );
 };
 
