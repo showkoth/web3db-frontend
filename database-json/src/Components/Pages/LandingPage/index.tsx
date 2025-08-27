@@ -668,7 +668,7 @@ const LandingPage: React.FC = () => {
         </Box>
 
         {/* Use Cases Section */}
-        <Box sx={{ my: 10 }}>
+        {/* <Box sx={{ my: 10 }}>
           <Typography
             variant="h4"
             gutterBottom
@@ -821,7 +821,7 @@ const LandingPage: React.FC = () => {
               </Box>
             </Grid>
           </Grid>
-        </Box>
+        </Box> */}
 
         {/* Call to Action Section */}
         <Box sx={{ 
