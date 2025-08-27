@@ -1112,6 +1112,21 @@ const LandingPage: React.FC = () => {
             />
           </Box>
         </Box>
+
+        {/* Footer */}
+        <Box sx={{ 
+          mt: 8, 
+          py: 4, 
+          borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+          textAlign: "center"
+        }}>
+          <Typography variant="body2" sx={{ 
+            color: "rgba(255, 255, 255, 0.7)",
+            fontSize: "0.9rem"
+          }}>
+            © 2025 Web3DB. Developed and maintained by Showkot Hossain. All rights reserved.
+          </Typography>
+        </Box>
       </Container>
       
       <MetaMaskModal
