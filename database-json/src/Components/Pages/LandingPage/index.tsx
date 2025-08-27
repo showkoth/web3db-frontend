@@ -620,7 +620,7 @@ const LandingPage: React.FC = () => {
               color: "#00D4FF"
             }}
           >
-            Only platform that guarantees individual data ownership, privacy, and secure computation.
+            Only platform that guarantees individual data ownership, privacy, and secure computation altogether.
           </Typography>
           
           <Grid container spacing={4}>
