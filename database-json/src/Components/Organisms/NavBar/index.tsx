@@ -9,12 +9,12 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import Chip from "@mui/material/Chip";
-import AdbIcon from "@mui/icons-material/Adb";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { useNavigate } from "react-router-dom";
 import { useWeb3 } from "../../../context/Web3Context";
 import MetaMaskModal from "../MetaMaskModal";
+import Web3DBLogo from "../Web3DBLogo";
 
 const pages = ["Home", "Demo", "Documentation"];
 
@@ -78,7 +78,7 @@ function ResponsiveAppBar() {
     <AppBar position="static" sx={{ backgroundColor: "transparent" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+          <Web3DBLogo sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} size={32} />
           <Typography
             variant="h5"
             noWrap
@@ -137,7 +137,7 @@ function ResponsiveAppBar() {
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+          <Web3DBLogo sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} size={28} />
           <Typography
             variant="h5"
             noWrap
