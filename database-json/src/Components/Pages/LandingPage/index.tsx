@@ -1113,50 +1113,6 @@ const LandingPage: React.FC = () => {
           </Box>
         </Box>
       </Container>
-
-      {/* Final Call to Action */}
-      <Box sx={{ 
-        textAlign: "center", 
-        py: 8,
-        background: "linear-gradient(45deg, rgba(0, 212, 255, 0.1) 0%, rgba(76, 175, 80, 0.1) 100%)",
-        borderTop: "1px solid rgba(255, 255, 255, 0.1)"
-      }}>
-        <Typography variant="h4" sx={{ 
-          fontWeight: 700, 
-          mb: 3, 
-          color: "white",
-          fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" }
-        }}>
-          Ready to Experience Web3DB?
-        </Typography>
-        <Typography variant="h6" sx={{ 
-          mb: 4, 
-          color: "rgba(255, 255, 255, 0.8)",
-          maxWidth: "600px",
-          margin: "0 auto 2rem auto"
-        }}>
-          Connect your wallet and start exploring the future of decentralized databases
-        </Typography>
-        <Button
-          variant="contained"
-          onClick={handleDemoClick}
-          size="large"
-          sx={{
-            px: 4,
-            py: 1.5,
-            fontSize: "1.1rem",
-            background: "linear-gradient(45deg, #00D4FF 30%, #4CAF50 90%)",
-            "&:hover": {
-              background: "linear-gradient(45deg, #0099CC 30%, #2E7D32 90%)",
-              transform: "translateY(-2px)",
-              boxShadow: "0 8px 25px rgba(0, 212, 255, 0.3)"
-            },
-            transition: "all 0.3s ease"
-          }}
-        >
-          Explore Web3DB
-        </Button>
-      </Box>
       
       <MetaMaskModal
         open={isMetaMaskModalOpen}
