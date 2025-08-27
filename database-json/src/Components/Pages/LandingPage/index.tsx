@@ -589,7 +589,7 @@ const LandingPage: React.FC = () => {
                 color: "#FF9800",
                 fontSize: { xs: "1.2rem", md: "1.5rem" }
               }}>
-                Developer Friendly
+                Universal SQL Interface
               </Typography>
               <Typography variant="body1" sx={{ 
                 lineHeight: 1.8,
