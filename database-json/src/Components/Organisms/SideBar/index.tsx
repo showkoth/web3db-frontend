@@ -34,7 +34,7 @@ const SideBar: React.FC<{ isOpen: boolean; toggleSidebar: () => void }> = ({
               to="/see-table"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              See Tables
+              Schema
             </StyledNavLink>
           </NavItem>
           <NavItem>
@@ -42,7 +42,7 @@ const SideBar: React.FC<{ isOpen: boolean; toggleSidebar: () => void }> = ({
               to="/run-query"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              Run Query
+              Query
             </StyledNavLink>
           </NavItem>
           {/* You can continue adding more navigation items as needed */}
