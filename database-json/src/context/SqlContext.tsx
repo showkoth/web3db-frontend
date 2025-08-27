@@ -111,6 +111,7 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
           method: "GET",
           headers: {
             "Accept": "application/json",
+            "ngrok-skip-browser-warning": "true",
           },
         }
       );

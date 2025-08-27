@@ -17,6 +17,7 @@ export const config = {
     HEADERS: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning page
     },
   },
 } as const;
