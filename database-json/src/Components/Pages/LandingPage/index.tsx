@@ -263,7 +263,7 @@ const LandingPage: React.FC = () => {
                   fontWeight: 600,
                   fontSize: { xs: "0.9rem", md: "1rem" }
                 }}>
-                  SQL Interface
+                  Universal SQL Interface
                 </Typography>
               </Box>
             </Box>
@@ -600,6 +600,316 @@ const LandingPage: React.FC = () => {
             </Box>
           </Grid>
         </Grid>
+        
+        {/* Stats Section */}
+        <Box sx={{ 
+          my: 10, 
+          p: 6, 
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          borderRadius: 3,
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          backdropFilter: "blur(10px)"
+        }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{ 
+              fontWeight: 700, 
+              mb: 6, 
+              textAlign: "center",
+              color: "#00D4FF"
+            }}
+          >
+            Only platform that guarantees individual data ownership, privacy, and secure computation.
+          </Typography>
+          
+          <Grid container spacing={4}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography variant="h3" sx={{ fontWeight: 800, color: "#00D4FF", mb: 1 }}>
+                  100%
+                </Typography>
+                <Typography variant="body1" sx={{ color: "rgba(255, 255, 255, 0.8)" }}>
+                  Decentralized
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography variant="h3" sx={{ fontWeight: 800, color: "#4CAF50", mb: 1 }}>
+                  Zero
+                </Typography>
+                <Typography variant="body1" sx={{ color: "rgba(255, 255, 255, 0.8)" }}>
+                  Single Points of Failure
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography variant="h3" sx={{ fontWeight: 800, color: "#FF9800", mb: 1 }}>
+                  SQL
+                </Typography>
+                <Typography variant="body1" sx={{ color: "rgba(255, 255, 255, 0.8)" }}>
+                  Universal Query Interface
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography variant="h3" sx={{ fontWeight: 800, color: "#E91E63", mb: 1 }}>
+                  TEE
+                </Typography>
+                <Typography variant="body1" sx={{ color: "rgba(255, 255, 255, 0.8)" }}>
+                  Secured by Hardware
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+
+        {/* Use Cases Section */}
+        <Box sx={{ my: 10 }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{ 
+              fontWeight: 700, 
+              mb: 6, 
+              textAlign: "center",
+              fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" }
+            }}
+          >
+            🎯 Real-World Applications
+          </Typography>
+          
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={6} lg={4}>
+              <Box sx={{ 
+                p: 4,
+                backgroundColor: "rgba(76, 175, 80, 0.1)",
+                borderRadius: 3,
+                border: "2px solid rgba(76, 175, 80, 0.3)",
+                height: "100%",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: "0 10px 30px rgba(76, 175, 80, 0.2)",
+                }
+              }}>
+                <Typography variant="h4" sx={{ mb: 3, fontSize: "2.5rem" }}>🏥</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: "#4CAF50" }}>
+                  Healthcare Data Management
+                </Typography>
+                <Typography variant="body2" sx={{ lineHeight: 1.6, color: "rgba(255, 255, 255, 0.9)" }}>
+                  Secure patient records with fine-grained access control. Enable research while protecting privacy through zero-trust architecture.
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} md={6} lg={4}>
+              <Box sx={{ 
+                p: 4,
+                backgroundColor: "rgba(33, 150, 243, 0.1)",
+                borderRadius: 3,
+                border: "2px solid rgba(33, 150, 243, 0.3)",
+                height: "100%",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: "0 10px 30px rgba(33, 150, 243, 0.2)",
+                }
+              }}>
+                <Typography variant="h4" sx={{ mb: 3, fontSize: "2.5rem" }}>🏦</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: "#2196F3" }}>
+                  Financial Services
+                </Typography>
+                <Typography variant="body2" sx={{ lineHeight: 1.6, color: "rgba(255, 255, 255, 0.9)" }}>
+                  Transparent financial data with immutable audit trails. Enable compliance reporting while maintaining data sovereignty.
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} md={6} lg={4}>
+              <Box sx={{ 
+                p: 4,
+                backgroundColor: "rgba(156, 39, 176, 0.1)",
+                borderRadius: 3,
+                border: "2px solid rgba(156, 39, 176, 0.3)",
+                height: "100%",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: "0 10px 30px rgba(156, 39, 176, 0.2)",
+                }
+              }}>
+                <Typography variant="h4" sx={{ mb: 3, fontSize: "2.5rem" }}>🏭</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: "#9C27B0" }}>
+                  Supply Chain Tracking
+                </Typography>
+                <Typography variant="body2" sx={{ lineHeight: 1.6, color: "rgba(255, 255, 255, 0.9)" }}>
+                  End-to-end traceability with verified data integrity. Build trust through transparent and immutable supply chain records.
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} md={6} lg={4}>
+              <Box sx={{ 
+                p: 4,
+                backgroundColor: "rgba(255, 152, 0, 0.1)",
+                borderRadius: 3,
+                border: "2px solid rgba(255, 152, 0, 0.3)",
+                height: "100%",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: "0 10px 30px rgba(255, 152, 0, 0.2)",
+                }
+              }}>
+                <Typography variant="h4" sx={{ mb: 3, fontSize: "2.5rem" }}>🎓</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: "#FF9800" }}>
+                  Academic Research
+                </Typography>
+                <Typography variant="body2" sx={{ lineHeight: 1.6, color: "rgba(255, 255, 255, 0.9)" }}>
+                  Collaborative research data sharing with verified provenance. Enable reproducible science while protecting intellectual property.
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} md={6} lg={4}>
+              <Box sx={{ 
+                p: 4,
+                backgroundColor: "rgba(244, 67, 54, 0.1)",
+                borderRadius: 3,
+                border: "2px solid rgba(244, 67, 54, 0.3)",
+                height: "100%",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: "0 10px 30px rgba(244, 67, 54, 0.2)",
+                }
+              }}>
+                <Typography variant="h4" sx={{ mb: 3, fontSize: "2.5rem" }}>🌱</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: "#F44336" }}>
+                  IoT Data Management
+                </Typography>
+                <Typography variant="body2" sx={{ lineHeight: 1.6, color: "rgba(255, 255, 255, 0.9)" }}>
+                  Secure IoT sensor data collection and analysis. Enable real-time insights while ensuring data integrity and privacy.
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} md={6} lg={4}>
+              <Box sx={{ 
+                p: 4,
+                backgroundColor: "rgba(0, 188, 212, 0.1)",
+                borderRadius: 3,
+                border: "2px solid rgba(0, 188, 212, 0.3)",
+                height: "100%",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: "0 10px 30px rgba(0, 188, 212, 0.2)",
+                }
+              }}>
+                <Typography variant="h4" sx={{ mb: 3, fontSize: "2.5rem" }}>🏛️</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: "#00BCD4" }}>
+                  Government Services
+                </Typography>
+                <Typography variant="body2" sx={{ lineHeight: 1.6, color: "rgba(255, 255, 255, 0.9)" }}>
+                  Transparent public records with citizen privacy protection. Enable open governance while maintaining security and compliance.
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+
+        {/* Call to Action Section */}
+        <Box sx={{ 
+          my: 10, 
+          p: 8, 
+          backgroundColor: "rgba(0, 212, 255, 0.1)",
+          borderRadius: 3,
+          border: "2px solid rgba(0, 212, 255, 0.3)",
+          textAlign: "center",
+          backdropFilter: "blur(10px)"
+        }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{ 
+              fontWeight: 700, 
+              mb: 3,
+              color: "#00D4FF"
+            }}
+          >
+            🚀 Ready to Get Started?
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{ 
+              mb: 4,
+              color: "rgba(255, 255, 255, 0.9)",
+              maxWidth: "600px",
+              mx: "auto",
+              lineHeight: 1.6
+            }}
+          >
+            Join the decentralized database revolution. Experience the power of Web3DB with our interactive demo or explore our comprehensive documentation.
+          </Typography>
+          <Box sx={{ display: "flex", gap: 3, justifyContent: "center", flexWrap: "wrap" }}>
+            <Button
+              variant="contained"
+              onClick={handleDemoClick}
+              size="large"
+              sx={{
+                px: 6,
+                py: 2,
+                fontSize: "1.2rem",
+                fontWeight: 600,
+                background: "linear-gradient(45deg, #00D4FF 30%, #4CAF50 90%)",
+                borderRadius: 3,
+                textTransform: "none",
+                boxShadow: "0 8px 25px rgba(0, 212, 255, 0.4)",
+                "&:hover": {
+                  background: "linear-gradient(45deg, #0099CC 30%, #2E7D32 90%)",
+                  transform: "translateY(-3px)",
+                  boxShadow: "0 12px 35px rgba(0, 212, 255, 0.5)"
+                },
+                transition: "all 0.3s ease"
+              }}
+            >
+              🎯 Launch Demo Now
+            </Button>
+            
+            <Button
+              variant="outlined"
+              onClick={() => window.location.href = "https://docs.web3db.org/docs/intro"}
+              size="large"
+              startIcon={<LaunchIcon />}
+              sx={{
+                px: 4,
+                py: 2,
+                fontSize: "1.1rem",
+                fontWeight: 500,
+                color: "white",
+                borderColor: "rgba(255, 255, 255, 0.5)",
+                borderWidth: 2,
+                borderRadius: 3,
+                textTransform: "none",
+                "&:hover": {
+                  borderColor: "#00D4FF",
+                  backgroundColor: "rgba(0, 212, 255, 0.1)",
+                  transform: "translateY(-2px)",
+                  color: "#00D4FF"
+                },
+                transition: "all 0.3s ease"
+              }}
+            >
+              Read Documentation
+            </Button>
+          </Box>
+        </Box>
+        
         <Box sx={{ my: 6, borderRadius: 2, overflow: "hidden" }}>
           <Typography
             variant="h4"
