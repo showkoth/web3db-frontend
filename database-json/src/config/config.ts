@@ -1,7 +1,7 @@
 // Configuration settings for the application
 export const config = {
   // Backend API base URL - uses environment variable with fallback
-  API_BASE_URL: process.env.REACT_APP_API_BASE_URL || 'http://129.74.154.215:8000',
+  API_BASE_URL: process.env.REACT_APP_API_BASE_URL || 'https://0165b3fdc1aa.ngrok-free.app',
   
   // Default wallet address for fallback when user wallet is not connected
   DEFAULT_WALLET_ADDRESS: process.env.REACT_APP_DEFAULT_WALLET_ADDRESS || '0x1A28b19f6d2ea1A05F9eFFbcCcbF7E9571877981',
