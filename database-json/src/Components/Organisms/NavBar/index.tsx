@@ -55,7 +55,7 @@ function ResponsiveAppBar() {
     if (page === "Demo") {
       if (isConnected) {
         // If already connected, go directly to the query page
-        navigate("/run-query");
+        navigate("/query");
       } else {
         // If not connected, show MetaMask modal
         setIsMetaMaskModalOpen(true);
@@ -71,7 +71,7 @@ function ResponsiveAppBar() {
   const handleMetaMaskSuccess = () => {
     setIsMetaMaskModalOpen(false);
     // Navigate to the demo/query page after successful connection
-    navigate("/run-query");
+    navigate("/query");
   };
 
   return (

@@ -31,7 +31,7 @@ const SideBar: React.FC<{ isOpen: boolean; toggleSidebar: () => void }> = ({
           </NavItem>
           <NavItem>
             <StyledNavLink
-              to="/see-table"
+              to="/schema"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Schema
@@ -39,7 +39,7 @@ const SideBar: React.FC<{ isOpen: boolean; toggleSidebar: () => void }> = ({
           </NavItem>
           <NavItem>
             <StyledNavLink
-              to="/run-query"
+              to="/query"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Query

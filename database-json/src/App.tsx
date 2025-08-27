@@ -69,7 +69,7 @@ function App() {
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route 
-                path="/run-query" 
+                path="/query" 
                 element={
                   <MainLayout
                     toggleSidebar={toggleSidebar}
@@ -80,7 +80,7 @@ function App() {
                 } 
               />
               <Route 
-                path="/see-table" 
+                path="/schema" 
                 element={
                   <MainLayout
                     toggleSidebar={toggleSidebar}

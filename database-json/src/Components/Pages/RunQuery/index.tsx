@@ -337,7 +337,7 @@ const RunQuery: React.FC = () => {
           }}
         >
           <DatabaseIcon sx={{ fontSize: 40, color: '#00D4FF' }} />
-          Universal Query Interface
+          Universal SQL Interface
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
           Execute SQL queries on the Web3DB decentralized database with your connected wallet.

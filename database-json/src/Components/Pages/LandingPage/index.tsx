@@ -94,10 +94,10 @@ const LandingPage: React.FC = () => {
   };
 
   const handleMetaMaskSuccess = () => {
-    console.log("MetaMask connected successfully, navigating to /run-query");
+    console.log("MetaMask connected successfully, navigating to /query");
     setIsMetaMaskModalOpen(false);
     // Navigate to the demo/query page after successful connection
-    navigate("/run-query");
+    navigate("/query");
   };
 
   return (
