@@ -11,6 +11,8 @@ import {
   CircularProgress,
   IconButton,
   Chip,
+  Card,
+  CardContent,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -19,22 +21,25 @@ import SecurityIcon from '@mui/icons-material/Security';
 import StorageIcon from '@mui/icons-material/Storage';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import { useWeb3 } from '../../../context/Web3Context';
+import { WalletType } from '../../../context/Web3Context';
 
-interface MetaMaskModalProps {
+interface WalletModalProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
   onDisconnect?: () => void;
 }
 
-const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess, onDisconnect }) => {
-  const { connectWallet, disconnectWallet, isConnected, isMetaMaskInstalled, error, account } = useWeb3();
+const WalletModal: React.FC<WalletModalProps> = ({ open, onClose, onSuccess, onDisconnect }) => {
+  const { connectWallet, disconnectWallet, isConnected, availableWallets, error, account, connectedWallet } = useWeb3();
   const [isConnecting, setIsConnecting] = React.useState(false);
+  const [selectedWallet, setSelectedWallet] = React.useState<WalletType | null>(null);
 
-  const handleConnect = async () => {
+  const handleConnect = async (walletType: WalletType) => {
     setIsConnecting(true);
+    setSelectedWallet(walletType);
     try {
-      await connectWallet();
+      await connectWallet(walletType);
       if (onSuccess) {
         onSuccess();
       }
@@ -42,6 +47,7 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
       console.error('Connection failed:', error);
     } finally {
       setIsConnecting(false);
+      setSelectedWallet(null);
     }
   };
 
@@ -66,11 +72,26 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
 
   const handleClose = () => {
     setIsConnecting(false);
+    setSelectedWallet(null);
     onClose();
+  };
+
+  // Get wallet display info
+  const getWalletDisplayInfo = (walletType: WalletType) => {
+    switch (walletType) {
+      case WalletType.METAMASK:
+        return { name: 'MetaMask', icon: '🦊', color: '#F6851B' };
+      case WalletType.COINBASE:
+        return { name: 'Coinbase Wallet', icon: '🔵', color: '#0052FF' };
+      default:
+        return { name: 'Wallet', icon: '💼', color: '#00D4FF' };
+    }
   };
 
   // If already connected, show success message
   if (isConnected && account) {
+    const connectedWalletInfo = connectedWallet ? getWalletDisplayInfo(connectedWallet) : { name: 'Wallet', icon: '💼', color: '#00D4FF' };
+    
     return (
       <Dialog 
         open={open} 
@@ -102,7 +123,7 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
                 width: 80,
                 height: 80,
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #00D4FF 0%, #4CAF50 100%)',
+                background: `linear-gradient(135deg, ${connectedWalletInfo.color} 0%, #4CAF50 100%)`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -120,7 +141,7 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
             </Box>
             
             <Typography variant="h4" fontWeight={700} color="white" gutterBottom>
-              Successfully Connected!
+              Connected to {connectedWalletInfo.name}!
             </Typography>
             
             <Chip
@@ -217,28 +238,18 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
       </DialogTitle>
       <DialogContent sx={{ px: 4 }}>
         <Box textAlign="center" py={2}>
-          {/* MetaMask Logo/Icon */}
           <Box
             sx={{
               width: 100,
               height: 100,
               borderRadius: 3,
-              background: 'linear-gradient(135deg, #F6851B 0%, #E2761B 100%)',
+              background: 'linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               mx: 'auto',
               mb: 3,
-              border: '3px solid rgba(246, 133, 27, 0.2)',
-              position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                inset: -2,
-                borderRadius: 3,
-                background: 'linear-gradient(135deg, #F6851B, #E2761B, #00D4FF)',
-                zIndex: -1,
-              }
+              border: '3px solid rgba(0, 212, 255, 0.2)',
             }}
           >
             <AccountBalanceWalletIcon sx={{ fontSize: 50, color: 'white' }} />
@@ -249,7 +260,7 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
           </Typography>
           
           <Typography variant="body1" color="rgba(255, 255, 255, 0.8)" paragraph sx={{ mb: 4 }}>
-            To access the demo, you need to connect your Web3 wallet.
+            Choose your preferred wallet to access the demo
           </Typography>
 
           {error && (
@@ -268,21 +279,76 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
             </Alert>
           )}
 
-          {!isMetaMaskInstalled && (
-            <Alert 
-              severity="warning" 
-              sx={{ 
-                mb: 3, 
-                textAlign: 'left',
-                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                border: '1px solid rgba(255, 193, 7, 0.3)',
-                color: '#FFC107',
-                borderRadius: 2
-              }}
-            >
-              MetaMask is not installed. You will be redirected to install MetaMask.
-            </Alert>
-          )}
+          {/* Wallet Selection Cards */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4 }}>
+            {availableWallets.map((wallet) => {
+              const displayInfo = getWalletDisplayInfo(wallet.type);
+              const isWalletConnecting = isConnecting && selectedWallet === wallet.type;
+              
+              return (
+                <Card
+                  key={wallet.type}
+                  onClick={() => !isConnecting && handleConnect(wallet.type)}
+                  sx={{
+                    background: wallet.installed
+                      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 153, 204, 0.1) 100%)'
+                      : 'linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(96, 96, 96, 0.1) 100%)',
+                    border: wallet.installed
+                      ? '2px solid rgba(0, 212, 255, 0.3)'
+                      : '2px solid rgba(128, 128, 128, 0.3)',
+                    borderRadius: 2,
+                    cursor: wallet.installed && !isConnecting ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.3s ease',
+                    '&:hover': wallet.installed && !isConnecting ? {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(0, 212, 255, 0.2)',
+                      borderColor: 'rgba(0, 212, 255, 0.5)'
+                    } : {}
+                  }}
+                >
+                  <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 2 }}>
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 2,
+                        background: wallet.installed
+                          ? `linear-gradient(135deg, ${displayInfo.color} 0%, ${displayInfo.color}CC 100%)`
+                          : 'linear-gradient(135deg, #888 0%, #666 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '24px'
+                      }}
+                    >
+                      {displayInfo.icon}
+                    </Box>
+                    <Box sx={{ flex: 1, textAlign: 'left' }}>
+                      <Typography variant="h6" color="white" fontWeight={600}>
+                        {displayInfo.name}
+                      </Typography>
+                      <Typography variant="body2" color={wallet.installed ? 'rgba(255, 255, 255, 0.7)' : 'rgba(128, 128, 128, 0.8)'}>
+                        {wallet.installed ? 'Ready to connect' : 'Not installed'}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      {isWalletConnecting ? (
+                        <CircularProgress size={24} sx={{ color: displayInfo.color }} />
+                      ) : wallet.installed ? (
+                        <Typography color={displayInfo.color} fontWeight={600}>
+                          Connect →
+                        </Typography>
+                      ) : (
+                        <Typography color="rgba(128, 128, 128, 0.8)" fontSize="0.8rem">
+                          Install
+                        </Typography>
+                      )}
+                    </Box>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </Box>
 
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" color="white" sx={{ mb: 3, fontWeight: 600 }}>
@@ -354,75 +420,28 @@ const MetaMaskModal: React.FC<MetaMaskModalProps> = ({ open, onClose, onSuccess,
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 4, pb: 4 }}>
-        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Button
-            onClick={handleConnect}
-            variant="contained"
-            fullWidth
-            size="large"
-            disabled={isConnecting}
-            startIcon={
-              isConnecting ? (
-                <CircularProgress size={20} sx={{ color: 'white' }} />
-              ) : (
-                <AccountBalanceWalletIcon />
-              )
+        <Button 
+          onClick={handleClose} 
+          variant="outlined" 
+          fullWidth
+          sx={{ 
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            color: 'rgba(255, 255, 255, 0.7)',
+            textTransform: 'none',
+            borderRadius: 2,
+            py: 1.2,
+            '&:hover': {
+              borderColor: 'rgba(255, 255, 255, 0.5)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              color: 'white'
             }
-            sx={{ 
-              background: isConnecting 
-                ? 'rgba(0, 212, 255, 0.3)'
-                : 'linear-gradient(135deg, #F6851B 0%, #E2761B 100%)',
-              color: 'white',
-              fontWeight: 700,
-              py: 1.8,
-              fontSize: '1.1rem',
-              textTransform: 'none',
-              borderRadius: 2,
-              border: '2px solid rgba(246, 133, 27, 0.3)',
-              '&:hover': {
-                background: isConnecting 
-                  ? 'rgba(0, 212, 255, 0.3)'
-                  : 'linear-gradient(135deg, #E2761B 0%, #D2691E 100%)',
-                transform: isConnecting ? 'none' : 'translateY(-2px)',
-                boxShadow: isConnecting ? 'none' : '0 8px 25px rgba(246, 133, 27, 0.4)'
-              },
-              '&:disabled': {
-                color: 'rgba(255, 255, 255, 0.7)'
-              },
-              transition: 'all 0.3s ease'
-            }}
-          >
-            {isConnecting
-              ? 'Connecting...'
-              : isMetaMaskInstalled
-              ? '🦊 Connect MetaMask'
-              : '🦊 Install & Connect MetaMask'
-            }
-          </Button>
-          
-          <Button 
-            onClick={handleClose} 
-            variant="outlined" 
-            fullWidth
-            sx={{ 
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-              color: 'rgba(255, 255, 255, 0.7)',
-              textTransform: 'none',
-              borderRadius: 2,
-              py: 1.2,
-              '&:hover': {
-                borderColor: 'rgba(255, 255, 255, 0.5)',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                color: 'white'
-              }
-            }}
-          >
-            Cancel
-          </Button>
-        </Box>
+          }}
+        >
+          Cancel
+        </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default MetaMaskModal;
+export default WalletModal;

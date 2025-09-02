@@ -40,7 +40,7 @@ import "brace/ext/language_tools";
 import "brace/ext/searchbox";
 import { SqlContext } from "../../../context/SqlContext";
 import { useWeb3 } from "../../../context/Web3Context";
-import MetaMaskModal from "../../Organisms/MetaMaskModal";
+import WalletModal from "../../Organisms/WalletModal";
 import ace from "ace-builds/src-noconflict/ace";
 interface ResultRow {
   [key: string]: any;
@@ -60,7 +60,7 @@ const RunQuery: React.FC = () => {
   
   const [inputQuery, setInputQuery] = useState<string>("SELECT * FROM patient_data WHERE PatientID = '38'");
   const [indexAttribute, setIndexAttribute] = useState<string>("PatientID");
-  const [isMetaMaskModalOpen, setIsMetaMaskModalOpen] = useState(false);
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
   // Pagination state
@@ -88,7 +88,7 @@ const RunQuery: React.FC = () => {
   const handleRunQuery = async () => {
     // Check if wallet is connected
     if (!isConnected) {
-      setIsMetaMaskModalOpen(true);
+      setIsWalletModalOpen(true);
       return;
     }
 
@@ -118,8 +118,9 @@ const RunQuery: React.FC = () => {
     }
   };
 
-  const handleMetaMaskSuccess = () => {
-    setIsMetaMaskModalOpen(false);
+  const handleWalletConnectSuccess = () => {
+    console.log("Wallet connected successfully!");
+    setIsWalletModalOpen(false);
   };
 
   const handleCopyQuery = () => {
@@ -599,11 +600,11 @@ const RunQuery: React.FC = () => {
       </Grid>
 
       {/* MetaMask Modal */}
-      <MetaMaskModal
-        open={isMetaMaskModalOpen}
-        onClose={() => setIsMetaMaskModalOpen(false)}
-        onSuccess={handleMetaMaskSuccess}
-        onDisconnect={() => setIsMetaMaskModalOpen(false)}
+      <WalletModal
+        open={isWalletModalOpen}
+        onClose={() => setIsWalletModalOpen(false)}
+        onSuccess={handleWalletConnectSuccess}
+        onDisconnect={() => setIsWalletModalOpen(false)}
       />
     </Box>
   );

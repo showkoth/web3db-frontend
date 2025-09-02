@@ -7,7 +7,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import useTheme from "@mui/material/styles/useTheme";
 import Spline from "@splinetool/react-spline";
 import ResponsiveAppBar from "../../Organisms/NavBar";
-import MetaMaskModal from "../../Organisms/MetaMaskModal";
+import WalletModal from "../../Organisms/WalletModal";
 import { Avatar, Container, Grid, Link, styled } from "@mui/material";
 import TaehoImage from "../../../Assets/Images/taeho.jpg";
 import WenzhanImage from "../../../Assets/Images/wenzhan.jpg";
@@ -87,15 +87,15 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [isMetaMaskModalOpen, setIsMetaMaskModalOpen] = React.useState(false);
+  const [isWalletModalOpen, setIsWalletModalOpen] = React.useState(false);
   
   const handleDemoClick = () => {
-    setIsMetaMaskModalOpen(true);
+    setIsWalletModalOpen(true);
   };
 
-  const handleMetaMaskSuccess = () => {
+  const handleWalletConnectSuccess = () => {
     console.log("MetaMask connected successfully, navigating to /query");
-    setIsMetaMaskModalOpen(false);
+    setIsWalletModalOpen(false);
     // Navigate to the demo/query page after successful connection
     navigate("/query");
   };
@@ -1129,11 +1129,11 @@ const LandingPage: React.FC = () => {
         </Box>
       </Container>
       
-      <MetaMaskModal
-        open={isMetaMaskModalOpen}
-        onClose={() => setIsMetaMaskModalOpen(false)}
-        onSuccess={handleMetaMaskSuccess}
-        onDisconnect={() => setIsMetaMaskModalOpen(false)}
+            <WalletModal
+        open={isWalletModalOpen}
+        onClose={() => setIsWalletModalOpen(false)}
+        onSuccess={handleWalletConnectSuccess}
+        onDisconnect={() => setIsWalletModalOpen(false)}
       />
     </Box>
   );

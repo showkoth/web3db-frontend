@@ -13,7 +13,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { useNavigate } from "react-router-dom";
 import { useWeb3 } from "../../../context/Web3Context";
-import MetaMaskModal from "../MetaMaskModal";
+import WalletModal from "../WalletModal";
 import Web3DBLogo from "../Web3DBLogo";
 
 const pages = ["Home", "Demo", "Documentation"];
@@ -22,7 +22,7 @@ function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
-  const [isMetaMaskModalOpen, setIsMetaMaskModalOpen] = React.useState(false);
+  const [isWalletModalOpen, setIsWalletModalOpen] = React.useState(false);
   const [anchorElWallet, setAnchorElWallet] = React.useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const { isConnected, account, disconnectWallet } = useWeb3();
@@ -54,11 +54,11 @@ function ResponsiveAppBar() {
     }
     if (page === "Demo") {
       if (isConnected) {
-        // If already connected, go directly to the query page
-        navigate("/query");
+        // Already connected, should disconnect
+        handleDisconnectWallet();
       } else {
-        // If not connected, show MetaMask modal
-        setIsMetaMaskModalOpen(true);
+        // Not connected, should open wallet modal
+        setIsWalletModalOpen(true);
       }
     }
     if (page === "Home") {
@@ -68,13 +68,10 @@ function ResponsiveAppBar() {
     handleCloseNavMenu();
   };
 
-  const handleMetaMaskSuccess = () => {
-    setIsMetaMaskModalOpen(false);
-    // Navigate to the demo/query page after successful connection
-    navigate("/query");
-  };
-
-  return (
+  const handleWalletConnectSuccess = () => {
+    console.log("Wallet connected successfully!");
+    setIsWalletModalOpen(false);
+  };  return (
     <AppBar position="static" sx={{ backgroundColor: "transparent" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
@@ -202,7 +199,7 @@ function ResponsiveAppBar() {
               </>
             ) : (
               <Button
-                onClick={() => setIsMetaMaskModalOpen(true)}
+                onClick={() => setIsWalletModalOpen(true)}
                 variant="outlined"
                 startIcon={<AccountBalanceWalletIcon />}
                 sx={{ 
@@ -221,11 +218,11 @@ function ResponsiveAppBar() {
         </Toolbar>
       </Container>
       
-      <MetaMaskModal
-        open={isMetaMaskModalOpen}
-        onClose={() => setIsMetaMaskModalOpen(false)}
-        onSuccess={handleMetaMaskSuccess}
-        onDisconnect={() => setIsMetaMaskModalOpen(false)}
+      <WalletModal
+        open={isWalletModalOpen}
+        onClose={() => setIsWalletModalOpen(false)}
+        onSuccess={handleWalletConnectSuccess}
+        onDisconnect={() => setIsWalletModalOpen(false)}
       />
     </AppBar>
   );
