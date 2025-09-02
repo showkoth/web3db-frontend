@@ -59,7 +59,7 @@ const RunQuery: React.FC = () => {
   
   const { isConnected, account } = useWeb3();
   
-  const [inputQuery, setInputQuery] = useState<string>("SELECT * FROM patient_data WHERE PatientID = '99'");
+  const [inputQuery, setInputQuery] = useState<string>("SELECT * FROM patient_data WHERE PatientID = '323'");
   const [indexAttribute, setIndexAttribute] = useState<string>("PatientID");
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -131,7 +131,7 @@ const RunQuery: React.FC = () => {
   const exampleQueries = [
     {
       label: "Get Patient by ID",
-      query: "SELECT * FROM patient_data WHERE PatientID = '99'",
+      query: "SELECT * FROM patient_data WHERE PatientID = '323'",
       description: "Retrieve specific patient data"
     },
     {
