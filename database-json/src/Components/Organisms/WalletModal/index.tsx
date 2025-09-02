@@ -21,6 +21,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import StorageIcon from '@mui/icons-material/Storage';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import { useWeb3 } from '../../../context/Web3Context';
+import { usePolicy } from '../../../context/PolicyContext';
 import { WalletType } from '../../../context/Web3Context';
 
 interface WalletModalProps {
@@ -32,6 +33,7 @@ interface WalletModalProps {
 
 const WalletModal: React.FC<WalletModalProps> = ({ open, onClose, onSuccess, onDisconnect }) => {
   const { connectWallet, disconnectWallet, isConnected, availableWallets, error, account, connectedWallet } = useWeb3();
+  const { isLoadingPolicies, policyCount } = usePolicy();
   const [isConnecting, setIsConnecting] = React.useState(false);
   const [selectedWallet, setSelectedWallet] = React.useState<WalletType | null>(null);
 
@@ -158,8 +160,19 @@ const WalletModal: React.FC<WalletModalProps> = ({ open, onClose, onSuccess, onD
             />
             
             <Typography variant="body1" color="rgba(255, 255, 255, 0.8)" sx={{ mb: 3 }}>
-              You're all set! Now you can access all Web3DB features.
+              {isLoadingPolicies 
+                ? "Setting up your access policies..." 
+                : policyCount === 0 
+                  ? "Creating default access policy for demo data..." 
+                  : `You're all set! Found ${policyCount} access ${policyCount === 1 ? 'policy' : 'policies'}. Now you can access all Web3DB features.`
+              }
             </Typography>
+
+            {isLoadingPolicies && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <CircularProgress size={24} sx={{ color: '#00D4FF' }} />
+              </Box>
+            )}
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 4, pb: 4 }}>
@@ -169,8 +182,11 @@ const WalletModal: React.FC<WalletModalProps> = ({ open, onClose, onSuccess, onD
               variant="contained" 
               fullWidth 
               size="large"
+              disabled={isLoadingPolicies}
               sx={{ 
-                background: 'linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)',
+                background: isLoadingPolicies 
+                  ? 'rgba(0, 212, 255, 0.3)'
+                  : 'linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)',
                 color: 'white',
                 fontWeight: 700,
                 py: 1.5,
@@ -178,14 +194,19 @@ const WalletModal: React.FC<WalletModalProps> = ({ open, onClose, onSuccess, onD
                 textTransform: 'none',
                 borderRadius: 2,
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #00B8E6 0%, #0088BB 100%)',
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 8px 25px rgba(0, 212, 255, 0.3)'
+                  background: isLoadingPolicies 
+                    ? 'rgba(0, 212, 255, 0.3)'
+                    : 'linear-gradient(135deg, #00B8E6 0%, #0088BB 100%)',
+                  transform: isLoadingPolicies ? 'none' : 'translateY(-1px)',
+                  boxShadow: isLoadingPolicies ? 'none' : '0 8px 25px rgba(0, 212, 255, 0.3)'
+                },
+                '&:disabled': {
+                  color: 'rgba(255, 255, 255, 0.7)'
                 },
                 transition: 'all 0.3s ease'
               }}
             >
-              Continue to Demo →
+              {isLoadingPolicies ? 'Setting up...' : 'Continue to Demo →'}
             </Button>
             <Button 
               onClick={handleDisconnect} 

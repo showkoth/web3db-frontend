@@ -10,6 +10,7 @@ import RunQuery from "./Components/Pages/RunQuery";
 import SeeTables from "./Components/Pages/SeeTables";
 import { SqlProvider } from "./context/SqlContext";
 import { Web3Provider } from "./context/Web3Context";
+import { PolicyProvider } from "./context/PolicyContext";
 import SideBar from "./Components/Organisms/SideBar";
 import ResponsiveAppBar from "./Components/Organisms/NavBar";
 import LandingPage from "./Components/Pages/LandingPage";
@@ -65,44 +66,46 @@ function App() {
     <Router>
       <div className="App">
         <Web3Provider>
-          <SqlProvider>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route 
-                path="/query" 
-                element={
-                  <MainLayout
-                    toggleSidebar={toggleSidebar}
-                    isSidebarOpen={isSidebarOpen}
-                  >
-                    <RunQuery />
-                  </MainLayout>
-                } 
-              />
-              <Route 
-                path="/schema" 
-                element={
-                  <MainLayout
-                    toggleSidebar={toggleSidebar}
-                    isSidebarOpen={isSidebarOpen}
-                  >
-                    <SeeTables />
-                  </MainLayout>
-                } 
-              />
-              <Route
-                path="*"
-                element={
-                  <MainLayout
-                    toggleSidebar={toggleSidebar}
-                    isSidebarOpen={isSidebarOpen}
-                  >
-                    <RunQuery />
-                  </MainLayout>
-                }
-              />
-            </Routes>
-          </SqlProvider>
+          <PolicyProvider>
+            <SqlProvider>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route 
+                  path="/query" 
+                  element={
+                    <MainLayout
+                      toggleSidebar={toggleSidebar}
+                      isSidebarOpen={isSidebarOpen}
+                    >
+                      <RunQuery />
+                    </MainLayout>
+                  } 
+                />
+                <Route 
+                  path="/schema" 
+                  element={
+                    <MainLayout
+                      toggleSidebar={toggleSidebar}
+                      isSidebarOpen={isSidebarOpen}
+                    >
+                      <SeeTables />
+                    </MainLayout>
+                  } 
+                />
+                <Route
+                  path="*"
+                  element={
+                    <MainLayout
+                      toggleSidebar={toggleSidebar}
+                      isSidebarOpen={isSidebarOpen}
+                    >
+                      <RunQuery />
+                    </MainLayout>
+                  }
+                />
+              </Routes>
+            </SqlProvider>
+          </PolicyProvider>
         </Web3Provider>
       </div>
     </Router>

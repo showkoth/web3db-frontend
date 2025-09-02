@@ -41,6 +41,7 @@ import "brace/ext/searchbox";
 import { SqlContext } from "../../../context/SqlContext";
 import { useWeb3 } from "../../../context/Web3Context";
 import WalletModal from "../../Organisms/WalletModal";
+import PolicyStatus from "../../Atoms/PolicyStatus";
 import ace from "ace-builds/src-noconflict/ace";
 interface ResultRow {
   [key: string]: any;
@@ -384,6 +385,9 @@ const RunQuery: React.FC = () => {
             </Typography>
           </Alert>
         )}
+
+        {/* Policy Status - Show only when connected */}
+        {isConnected && <PolicyStatus />}
       </Box>
 
       <Grid container spacing={3}>
