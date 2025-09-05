@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Paper,
@@ -16,7 +16,6 @@ import {
   CircularProgress,
   Button,
   Grid,
-  Divider,
   IconButton,
   Tooltip,
   Stack,
@@ -24,6 +23,18 @@ import {
   AccordionSummary,
   AccordionDetails,
   Badge,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Switch,
+  FormControlLabel,
+  Snackbar,
 } from "@mui/material";
 import {
   Storage as DatabaseIcon,
@@ -32,15 +43,138 @@ import {
   Search as SearchIcon,
   Refresh as RefreshIcon,
   ExpandMore as ExpandMoreIcon,
-  Info as InfoIcon,
   Schedule as ScheduleIcon,
   DataObject as DataIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon,
 } from "@mui/icons-material";
 import { SqlContext } from "../../../context/SqlContext";
+import { config, buildApiUrl } from "../../../config/config";
 
 const SeeTables: React.FC = () => {
   console.log("SeeTables component is rendering");
   const { schemas, fetchSchemas, schemasLoading, error } = useContext(SqlContext);
+
+  // State for schema management
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedSchema, setSelectedSchema] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+
+  // Form state for create/edit schema
+  const [schemaForm, setSchemaForm] = useState({
+    table_name: '',
+    columns: [{ name: '', type: 'string', nullable: false }],
+    primary_key: [''],
+    indexes: ['PatientID', 'HospitalID', 'Age']
+  });
+
+  // API functions for schema management
+  const createSchema = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(buildApiUrl('/schemas'), {
+        method: 'POST',
+        headers: config.REQUEST_CONFIG.HEADERS,
+        body: JSON.stringify({
+          table_name: schemaForm.table_name,
+          table_schema: {
+            columns: schemaForm.columns,
+            primary_key: schemaForm.primary_key,
+            indexes: schemaForm.indexes
+          }
+        })
+      });
+
+      const data = await response.json();
+      if (data.status === 'success') {
+        setNotification({ open: true, message: 'Schema created successfully!', severity: 'success' });
+        setCreateDialogOpen(false);
+        fetchSchemas && fetchSchemas();
+        resetForm();
+      } else {
+        throw new Error(data.message || 'Failed to create schema');
+      }
+    } catch (err) {
+      setNotification({ 
+        open: true, 
+        message: err instanceof Error ? err.message : 'Failed to create schema', 
+        severity: 'error' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteSchema = async (tableName: string) => {
+    if (!window.confirm(`Are you sure you want to delete the schema for table "${tableName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(buildApiUrl(`/schemas/${tableName}`), {
+        method: 'DELETE',
+        headers: config.REQUEST_CONFIG.HEADERS,
+      });
+
+      const data = await response.json();
+      if (data.status === 'success') {
+        setNotification({ open: true, message: 'Schema deleted successfully!', severity: 'success' });
+        fetchSchemas && fetchSchemas();
+      } else {
+        throw new Error(data.message || 'Failed to delete schema');
+      }
+    } catch (err) {
+      setNotification({ 
+        open: true, 
+        message: err instanceof Error ? err.message : 'Failed to delete schema', 
+        severity: 'error' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setSchemaForm({
+      table_name: '',
+      columns: [{ name: '', type: 'string', nullable: false }],
+      primary_key: [''],
+      indexes: ['PatientID', 'HospitalID', 'Age']
+    });
+  };
+
+  const addColumn = () => {
+    setSchemaForm(prev => ({
+      ...prev,
+      columns: [...prev.columns, { name: '', type: 'string', nullable: false }]
+    }));
+  };
+
+  const removeColumn = (index: number) => {
+    setSchemaForm(prev => ({
+      ...prev,
+      columns: prev.columns.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateColumn = (index: number, field: string, value: any) => {
+    setSchemaForm(prev => ({
+      ...prev,
+      columns: prev.columns.map((col, i) => 
+        i === index ? { ...col, [field]: value } : col
+      )
+    }));
+  };
 
   useEffect(() => {
     console.log("SeeTables component mounted, calling fetchSchemas");
@@ -108,19 +242,33 @@ const SeeTables: React.FC = () => {
             </Typography>
           </Box>
           
-          <Tooltip title="Refresh Schemas">
-            <IconButton 
-              onClick={handleRefresh} 
-              disabled={schemasLoading}
-              sx={{ 
-                bgcolor: 'white', 
-                border: '1px solid #e0e0e0',
-                '&:hover': { bgcolor: '#f5f5f5' }
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setCreateDialogOpen(true)}
+              sx={{
+                background: 'linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)',
+                textTransform: 'none',
+                fontWeight: 600
               }}
             >
-              <RefreshIcon />
-            </IconButton>
-          </Tooltip>
+              Create Schema
+            </Button>
+            <Tooltip title="Refresh Schemas">
+              <IconButton 
+                onClick={handleRefresh} 
+                disabled={schemasLoading}
+                sx={{ 
+                  bgcolor: 'white', 
+                  border: '1px solid #e0e0e0',
+                  '&:hover': { bgcolor: '#f5f5f5' }
+                }}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Stack>
 
         {/* Status Information */}
@@ -294,6 +442,47 @@ const SeeTables: React.FC = () => {
                             />
                           </Stack>
                         </Box>
+                        <Stack direction="row" spacing={1}>
+                          <Tooltip title="Edit Schema">
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedSchema({ name: tableName, data: tableData });
+                                setSchemaForm({
+                                  table_name: tableName,
+                                  columns: tableData.columns,
+                                  primary_key: tableData.primary_key,
+                                  indexes: tableData.indexes
+                                });
+                                setEditDialogOpen(true);
+                              }}
+                              sx={{ 
+                                bgcolor: 'rgba(33, 150, 243, 0.1)', 
+                                color: '#2196F3',
+                                '&:hover': { bgcolor: 'rgba(33, 150, 243, 0.2)' }
+                              }}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete Schema">
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteSchema(tableName);
+                              }}
+                              sx={{ 
+                                bgcolor: 'rgba(244, 67, 54, 0.1)', 
+                                color: '#f44336',
+                                '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.2)' }
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
                       </Stack>
                     </AccordionSummary>
                     
@@ -408,6 +597,267 @@ const SeeTables: React.FC = () => {
           </Stack>
         </Box>
       )}
+
+      {/* Create Schema Dialog */}
+      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <AddIcon sx={{ color: '#00D4FF' }} />
+            <Typography variant="h6" fontWeight={600}>Create New Table Schema</Typography>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ mt: 2 }}>
+            <TextField
+              label="Table Name"
+              value={schemaForm.table_name}
+              onChange={(e) => setSchemaForm(prev => ({ ...prev, table_name: e.target.value }))}
+              placeholder="e.g., patient_data"
+              fullWidth
+              required
+            />
+            
+            <Box>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                <Typography variant="h6" fontWeight={600}>Columns</Typography>
+                <Button startIcon={<AddIcon />} onClick={addColumn} size="small">
+                  Add Column
+                </Button>
+              </Stack>
+              
+              {schemaForm.columns.map((column, index) => (
+                <Paper key={index} sx={{ p: 2, mb: 2, bgcolor: '#f8f9fa' }}>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={12} sm={4}>
+                      <TextField
+                        label="Column Name"
+                        value={column.name}
+                        onChange={(e) => updateColumn(index, 'name', e.target.value)}
+                        fullWidth
+                        size="small"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Data Type</InputLabel>
+                        <Select
+                          value={column.type}
+                          label="Data Type"
+                          onChange={(e) => updateColumn(index, 'type', e.target.value)}
+                        >
+                          <MenuItem value="string">String</MenuItem>
+                          <MenuItem value="integer">Integer</MenuItem>
+                          <MenuItem value="float">Float</MenuItem>
+                          <MenuItem value="boolean">Boolean</MenuItem>
+                          <MenuItem value="datetime">DateTime</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={column.nullable}
+                            onChange={(e) => updateColumn(index, 'nullable', e.target.checked)}
+                          />
+                        }
+                        label="Nullable"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                      <IconButton 
+                        onClick={() => removeColumn(index)}
+                        disabled={schemaForm.columns.length === 1}
+                        color="error"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              ))}
+            </Box>
+
+            <TextField
+              label="Primary Key (comma-separated)"
+              value={schemaForm.primary_key.join(', ')}
+              onChange={(e) => setSchemaForm(prev => ({ 
+                ...prev, 
+                primary_key: e.target.value.split(',').map(k => k.trim()).filter(k => k) 
+              }))}
+              placeholder="e.g., PatientID"
+              fullWidth
+              helperText="Enter column names that form the primary key"
+            />
+
+            <TextField
+              label="Indexes (comma-separated)"
+              value={schemaForm.indexes.join(', ')}
+              onChange={(e) => setSchemaForm(prev => ({ 
+                ...prev, 
+                indexes: e.target.value.split(',').map(k => k.trim()).filter(k => k) 
+              }))}
+              placeholder="e.g., PatientID, HospitalID, Age"
+              fullWidth
+              helperText="Enter column names to be indexed for faster queries"
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setCreateDialogOpen(false); resetForm(); }} startIcon={<CancelIcon />}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={createSchema} 
+            variant="contained" 
+            startIcon={<SaveIcon />}
+            disabled={loading || !schemaForm.table_name || schemaForm.columns.some(col => !col.name)}
+            sx={{
+              background: 'linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)',
+            }}
+          >
+            {loading ? 'Creating...' : 'Create Schema'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Schema Dialog */}
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <EditIcon sx={{ color: '#2196F3' }} />
+            <Typography variant="h6" fontWeight={600}>Edit Schema: {selectedSchema?.name}</Typography>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Alert severity="info" sx={{ mb: 2 }}>
+            Note: Editing schemas in a production environment should be done carefully as it may affect existing data.
+          </Alert>
+          <Stack spacing={3} sx={{ mt: 2 }}>
+            <TextField
+              label="Table Name"
+              value={schemaForm.table_name}
+              onChange={(e) => setSchemaForm(prev => ({ ...prev, table_name: e.target.value }))}
+              fullWidth
+              disabled // Usually table name shouldn't be editable
+            />
+            
+            <Box>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                <Typography variant="h6" fontWeight={600}>Columns</Typography>
+                <Button startIcon={<AddIcon />} onClick={addColumn} size="small">
+                  Add Column
+                </Button>
+              </Stack>
+              
+              {schemaForm.columns.map((column, index) => (
+                <Paper key={index} sx={{ p: 2, mb: 2, bgcolor: '#f8f9fa' }}>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={12} sm={4}>
+                      <TextField
+                        label="Column Name"
+                        value={column.name}
+                        onChange={(e) => updateColumn(index, 'name', e.target.value)}
+                        fullWidth
+                        size="small"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Data Type</InputLabel>
+                        <Select
+                          value={column.type}
+                          label="Data Type"
+                          onChange={(e) => updateColumn(index, 'type', e.target.value)}
+                        >
+                          <MenuItem value="string">String</MenuItem>
+                          <MenuItem value="integer">Integer</MenuItem>
+                          <MenuItem value="float">Float</MenuItem>
+                          <MenuItem value="boolean">Boolean</MenuItem>
+                          <MenuItem value="datetime">DateTime</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={column.nullable}
+                            onChange={(e) => updateColumn(index, 'nullable', e.target.checked)}
+                          />
+                        }
+                        label="Nullable"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                      <IconButton 
+                        onClick={() => removeColumn(index)}
+                        disabled={schemaForm.columns.length === 1}
+                        color="error"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              ))}
+            </Box>
+
+            <TextField
+              label="Primary Key (comma-separated)"
+              value={schemaForm.primary_key.join(', ')}
+              onChange={(e) => setSchemaForm(prev => ({ 
+                ...prev, 
+                primary_key: e.target.value.split(',').map(k => k.trim()).filter(k => k) 
+              }))}
+              fullWidth
+              helperText="Enter column names that form the primary key"
+            />
+
+            <TextField
+              label="Indexes (comma-separated)"
+              value={schemaForm.indexes.join(', ')}
+              onChange={(e) => setSchemaForm(prev => ({ 
+                ...prev, 
+                indexes: e.target.value.split(',').map(k => k.trim()).filter(k => k) 
+              }))}
+              fullWidth
+              helperText="Enter column names to be indexed for faster queries"
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setEditDialogOpen(false); resetForm(); }} startIcon={<CancelIcon />}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={createSchema} 
+            variant="contained" 
+            startIcon={<SaveIcon />}
+            disabled={loading || !schemaForm.table_name || schemaForm.columns.some(col => !col.name)}
+            sx={{
+              background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)',
+            }}
+          >
+            {loading ? 'Updating...' : 'Update Schema'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={() => setNotification(prev => ({ ...prev, open: false }))}
+      >
+        <Alert 
+          onClose={() => setNotification(prev => ({ ...prev, open: false }))} 
+          severity={notification.severity}
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
