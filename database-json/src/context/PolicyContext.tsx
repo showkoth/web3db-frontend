@@ -27,18 +27,7 @@ interface PolicyState {
   initializePoliciesForUser: () => Promise<void>;
 }
 
-const initialContext: Partial<PolicyState> = {
-  policyCount: 0,
-  policies: [],
-  isLoadingPolicies: false,
-  policyError: null,
-  hasFetchedPolicyCount: false,
-  checkPolicyCount: async () => {},
-  createDefaultPolicy: async () => {},
-  initializePoliciesForUser: async () => {},
-};
-
-export const PolicyContext = createContext<Partial<PolicyState>>(initialContext);
+export const PolicyContext = createContext<PolicyState | undefined>(undefined);
 
 interface PolicyProviderProps {
   children: ReactNode;
@@ -176,20 +165,24 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
 
   // Effect to initialize policies when wallet connects (with a small delay to avoid race conditions)
   useEffect(() => {
+    console.log("PolicyContext useEffect triggered:", { account, isConnected, hasFetchedPolicyCount });
+    
     if (account && isConnected) {
       const timer = setTimeout(() => {
+        console.log("Initializing policies for user...");
         initializePoliciesForUser();
       }, 500); // Small delay to ensure wallet connection is fully established
 
       return () => clearTimeout(timer);
     } else {
       // Reset policy state when wallet disconnects
+      console.log("Resetting policy state (wallet disconnected)");
       setPolicyCount(0);
       setPolicies([]);
       setPolicyError(null);
       setHasFetchedPolicyCount(false);
     }
-  }, [account, isConnected, initializePoliciesForUser]);
+  }, [account, isConnected, hasFetchedPolicyCount, initializePoliciesForUser]);
 
   const contextValue: PolicyState = {
     policyCount,
@@ -201,6 +194,16 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
     createDefaultPolicy,
     initializePoliciesForUser,
   };
+
+  // Debug log to track context values
+  console.log("PolicyContext providing values:", {
+    policyCount,
+    isLoadingPolicies,
+    policyError,
+    hasFetchedPolicyCount,
+    account,
+    isConnected
+  });
 
   return (
     <PolicyContext.Provider value={contextValue}>
@@ -215,5 +218,5 @@ export const usePolicy = (): PolicyState => {
   if (context === undefined) {
     throw new Error('usePolicy must be used within a PolicyProvider');
   }
-  return context as PolicyState;
+  return context;
 };

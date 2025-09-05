@@ -24,9 +24,9 @@ const PolicyStatus: React.FC = () => {
           variant="outlined" 
         />
         <Chip 
-          label={`Policies: ${policyCount}`} 
+          label={`Policies: ${policyCount ?? 0}`} 
           size="small" 
-          color={policyCount > 0 ? 'success' : 'default'}
+          color={(policyCount ?? 0) > 0 ? 'success' : 'default'}
         />
         {isLoadingPolicies && (
           <Chip 
@@ -43,7 +43,7 @@ const PolicyStatus: React.FC = () => {
         </Alert>
       )}
       
-      {policyCount === 0 && !isLoadingPolicies && !policyError && (
+      {(policyCount ?? 0) === 0 && !isLoadingPolicies && !policyError && (
         <Alert severity="info" sx={{ mt: 1 }}>
           No policies found. A default policy will be created automatically.
         </Alert>

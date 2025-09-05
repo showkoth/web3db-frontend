@@ -20,8 +20,6 @@ import {
   IconButton,
   Tooltip,
   LinearProgress,
-  Divider,
-  ButtonGroup,
   Stack,
 } from "@mui/material";
 import {
@@ -42,6 +40,7 @@ import { SqlContext } from "../../../context/SqlContext";
 import { useWeb3 } from "../../../context/Web3Context";
 import WalletModal from "../../Organisms/WalletModal";
 import PolicyStatus from "../../Atoms/PolicyStatus";
+import DataAccessVisualization from "../../Organisms/DataAccessVisualization";
 import ace from "ace-builds/src-noconflict/ace";
 interface ResultRow {
   [key: string]: any;
@@ -388,6 +387,14 @@ const RunQuery: React.FC = () => {
 
         {/* Policy Status - Show only when connected */}
         {isConnected && <PolicyStatus />}
+        
+        {/* Data Access Visualization */}
+        {isConnected && (
+          <DataAccessVisualization 
+            currentResultsCount={results ? results.length : 0}
+            isQueryExecuted={results !== null}
+          />
+        )}
       </Box>
 
       <Grid container spacing={3}>
