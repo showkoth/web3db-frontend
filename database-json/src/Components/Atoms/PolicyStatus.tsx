@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Typography, Chip, Alert } from '@mui/material';
+import { Box, Typography, Chip, Alert, Button } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import { usePolicy } from '../../context/PolicyContext';
 import { useWeb3 } from '../../context/Web3Context';
 
@@ -35,6 +36,16 @@ const PolicyStatus: React.FC = () => {
             color="info" 
           />
         )}
+        <Button
+          component={RouterLink}
+          to="/policies"
+          size="small"
+          variant="outlined"
+          color="primary"
+          sx={{ ml: 'auto' }}
+        >
+          🔒 Manage Policies
+        </Button>
       </Box>
 
       {policyError && (
@@ -45,7 +56,17 @@ const PolicyStatus: React.FC = () => {
       
       {(policyCount ?? 0) === 0 && !isLoadingPolicies && !policyError && (
         <Alert severity="info" sx={{ mt: 1 }}>
-          No policies found. A default policy will be created automatically.
+          No policies found. Visit the{' '}
+          <Button
+            component={RouterLink}
+            to="/policies"
+            size="small"
+            variant="text"
+            sx={{ textTransform: 'none', p: 0, minWidth: 'auto' }}
+          >
+            Policy Management
+          </Button>
+          {' '}page to create access policies.
         </Alert>
       )}
     </Box>

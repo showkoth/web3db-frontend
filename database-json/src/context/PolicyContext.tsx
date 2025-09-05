@@ -25,6 +25,8 @@ interface PolicyState {
   checkPolicyCount: () => Promise<void>;
   createDefaultPolicy: () => Promise<void>;
   initializePoliciesForUser: () => Promise<void>;
+  refreshPolicies: () => Promise<void>;
+  getPolicies: () => Promise<AccessPolicy[]>;
 }
 
 export const PolicyContext = createContext<PolicyState | undefined>(undefined);
@@ -141,7 +143,61 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
     }
   }, [account]);
 
-  // Initialize policies for a newly connected user
+  // Get all policies for the connected wallet
+  const getPolicies = useCallback(async (): Promise<AccessPolicy[]> => {
+    if (!account) {
+      console.log("No wallet address available for getting policies");
+      return [];
+    }
+
+    setIsLoadingPolicies(true);
+    setPolicyError(null);
+
+    try {
+      const response = await fetch(
+        buildApiUrl(`/access-policies/${account}`),
+        {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Policies response:", data);
+
+      if (data.status === 'success') {
+        const fetchedPolicies = data.policies || [];
+        setPolicies(fetchedPolicies);
+        setPolicyCount(data.policy_count || 0);
+        setPolicyError(null);
+        return fetchedPolicies;
+      } else {
+        throw new Error(data.message || 'Failed to fetch policies');
+      }
+    } catch (err) {
+      console.error("Error getting policies:", err);
+      if (err instanceof Error) {
+        setPolicyError(`Failed to get policies: ${err.message}`);
+      } else {
+        setPolicyError("An unknown error occurred while getting policies");
+      }
+      return [];
+    } finally {
+      setIsLoadingPolicies(false);
+    }
+  }, [account]);
+
+  // Refresh policies (combination of count and full policy list)
+  const refreshPolicies = useCallback(async () => {
+    await getPolicies();
+  }, [getPolicies]);
   const initializePoliciesForUser = useCallback(async () => {
     if (!account || !isConnected) {
       return;
@@ -193,6 +249,8 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
     checkPolicyCount,
     createDefaultPolicy,
     initializePoliciesForUser,
+    refreshPolicies,
+    getPolicies,
   };
 
   // Debug log to track context values

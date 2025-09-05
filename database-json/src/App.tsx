@@ -8,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import styled from "styled-components";
 import RunQuery from "./Components/Pages/RunQuery";
 import SeeTables from "./Components/Pages/SeeTables";
+import PolicyManagement from "./Components/Pages/PolicyManagement";
 import { SqlProvider } from "./context/SqlContext";
 import { Web3Provider } from "./context/Web3Context";
 import { PolicyProvider } from "./context/PolicyContext";
@@ -89,6 +90,17 @@ function App() {
                       isSidebarOpen={isSidebarOpen}
                     >
                       <SeeTables />
+                    </MainLayout>
+                  } 
+                />
+                <Route 
+                  path="/policies" 
+                  element={
+                    <MainLayout
+                      toggleSidebar={toggleSidebar}
+                      isSidebarOpen={isSidebarOpen}
+                    >
+                      <PolicyManagement />
                     </MainLayout>
                   } 
                 />

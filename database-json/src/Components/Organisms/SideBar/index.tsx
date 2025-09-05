@@ -45,6 +45,14 @@ const SideBar: React.FC<{ isOpen: boolean; toggleSidebar: () => void }> = ({
               Query
             </StyledNavLink>
           </NavItem>
+          <NavItem>
+            <StyledNavLink
+              to="/policies"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Policies
+            </StyledNavLink>
+          </NavItem>
           {/* You can continue adding more navigation items as needed */}
         </NavList>
       </SideBarContainer>
