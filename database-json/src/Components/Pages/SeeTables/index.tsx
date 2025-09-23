@@ -81,16 +81,17 @@ const SeeTables: React.FC = () => {
       description: "Healthcare patient records",
       ddl: `CREATE TABLE patient_data (
   PatientID VARCHAR PRIMARY KEY,
-  Name VARCHAR,
-  Age INTEGER,
+  Name VARCHAR NOT NULL,
+  Age INTEGER NOT NULL,
   Gender VARCHAR,
   BloodType VARCHAR,
   Condition VARCHAR,
   VisitDate VARCHAR,
   Doctor VARCHAR,
-  HospitalID VARCHAR,
+  HospitalID VARCHAR NOT NULL,
   Prescription VARCHAR,
-  DiagnosisReport VARCHAR
+  DiagnosisReport VARCHAR,
+  OwnerID VARCHAR NOT NULL
 );`
     },
     {
@@ -164,15 +165,19 @@ const SeeTables: React.FC = () => {
         const columnName = parts[0];
         const columnType = parts[1] || 'VARCHAR';
         const isPrimaryKey = def.toUpperCase().includes('PRIMARY KEY');
+        const hasNotNull = def.toUpperCase().includes('NOT NULL');
         
         if (isPrimaryKey) {
           primaryKeys.push(columnName);
         }
         
+        // A column is nullable if it's NOT a primary key AND doesn't have NOT NULL constraint
+        const isNullable = !isPrimaryKey && !hasNotNull;
+        
         columns.push({
           name: columnName,
           type: columnType.toLowerCase(),
-          nullable: !isPrimaryKey // Primary keys are typically not nullable
+          nullable: isNullable
         });
       });
       
