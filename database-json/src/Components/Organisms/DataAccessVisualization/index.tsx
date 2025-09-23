@@ -84,12 +84,14 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
   }, [hasFetched]);
 
   const calculateAccessPercentage = () => {
-    if (totalRows === 0) return 0;
-    return Math.min((currentResultsCount / totalRows) * 100, 100);
+    const safeTotal = totalRows || 0;
+    const safeCount = currentResultsCount || 0;
+    if (safeTotal === 0) return 0;
+    return Math.min((safeCount / safeTotal) * 100, 100);
   };
 
   const accessPercentage = calculateAccessPercentage();
-  const restrictedCount = totalRows - currentResultsCount;
+  const restrictedCount = Math.max((totalRows || 0) - (currentResultsCount || 0), 0);
 
   const getAccessLevel = () => {
     if (accessPercentage === 0) return { label: 'No Access', color: '#f44336', icon: <VisibilityOffIcon /> };
@@ -188,7 +190,7 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
                   Accessible Data
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {currentResultsCount.toLocaleString()} / {totalRows.toLocaleString()} records
+                  {(currentResultsCount || 0).toLocaleString()} / {(totalRows || 0).toLocaleString()} records
                 </Typography>
               </Box>
               
@@ -213,7 +215,7 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
             <Stack direction="row" spacing={2} flexWrap="wrap">
               <Chip
                 icon={<VisibilityIcon />}
-                label={`${currentResultsCount.toLocaleString()} Accessible`}
+                label={`${(currentResultsCount || 0).toLocaleString()} Accessible`}
                 size="small"
                 sx={{ 
                   bgcolor: 'rgba(76, 175, 80, 0.1)', 
@@ -223,7 +225,7 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
               />
               <Chip
                 icon={<LockIcon />}
-                label={`${restrictedCount.toLocaleString()} Restricted`}
+                label={`${(restrictedCount || 0).toLocaleString()} Restricted`}
                 size="small"
                 sx={{ 
                   bgcolor: 'rgba(244, 67, 54, 0.1)', 
@@ -248,7 +250,7 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
           >
             <Typography variant="body2">
               <strong>Access Control Active:</strong> Due to your wallet's access policies, 
-              you can currently view {currentResultsCount.toLocaleString()} out of {totalRows.toLocaleString()} total records 
+              you can currently view {(currentResultsCount || 0).toLocaleString()} out of {(totalRows || 0).toLocaleString()} total records 
               ({accessPercentage.toFixed(1)}% of available data).
             </Typography>
           </Alert>
@@ -265,7 +267,7 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
             }}
           >
             <Typography variant="body2">
-              <strong>Ready to Query:</strong> The database contains {totalRows.toLocaleString()} total records. 
+              <strong>Ready to Query:</strong> The database contains {(totalRows || 0).toLocaleString()} total records. 
               Run a query to see what data your wallet can access.
             </Typography>
           </Alert>
