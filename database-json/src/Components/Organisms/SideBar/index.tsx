@@ -39,6 +39,14 @@ const SideBar: React.FC<{ isOpen: boolean; toggleSidebar: () => void }> = ({
           </NavItem>
           <NavItem>
             <StyledNavLink
+              to="/upload"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Upload
+            </StyledNavLink>
+          </NavItem>
+          <NavItem>
+            <StyledNavLink
               to="/query"
               className={({ isActive }) => (isActive ? "active" : "")}
             >

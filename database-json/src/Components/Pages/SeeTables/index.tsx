@@ -37,7 +37,6 @@ import {
   Snackbar,
   Tabs,
   Tab,
-  Box as MuiBox,
 } from "@mui/material";
 import {
   Storage as DatabaseIcon,
@@ -53,6 +52,7 @@ import {
   Save as SaveIcon,
   Cancel as CancelIcon,
   Code as CodeIcon,
+  ContentCopy as CopyIcon,
 } from "@mui/icons-material";
 import { SqlContext } from "../../../context/SqlContext";
 import { config, buildApiUrl } from "../../../config/config";
@@ -73,6 +73,11 @@ const SeeTables: React.FC = () => {
   // State for DDL input mode
   const [isFormMode, setIsFormMode] = useState(true);
   const [ddlInput, setDdlInput] = useState('');
+
+  // State for SQL view dialog
+  const [sqlDialogOpen, setSqlDialogOpen] = useState(false);
+  const [selectedTableSql, setSelectedTableSql] = useState({ name: '', sql: '' });
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Example DDL templates
   const ddlExamples = [
@@ -355,6 +360,31 @@ const SeeTables: React.FC = () => {
     });
     setDdlInput('');
     setIsFormMode(true);
+  };
+
+  // Handle SQL dialog
+  const handleViewSql = (tableName: string, sql: string) => {
+    setSelectedTableSql({ name: tableName, sql });
+    setSqlDialogOpen(true);
+  };
+
+  const handleCopySql = async () => {
+    try {
+      await navigator.clipboard.writeText(selectedTableSql.sql);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy SQL:', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = selectedTableSql.sql;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    }
   };
 
   const addColumn = () => {
@@ -672,7 +702,7 @@ const SeeTables: React.FC = () => {
                                 size="small"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  alert(`SQL Schema for ${tableName}:\n\n${schemaSql}`);
+                                  handleViewSql(tableName, schemaSql);
                                 }}
                                 sx={{ 
                                   bgcolor: 'rgba(76, 175, 80, 0.1)', 
@@ -1051,6 +1081,80 @@ const SeeTables: React.FC = () => {
           >
             {loading ? 'Creating...' : 'Create Schema'}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* SQL View Dialog */}
+      <Dialog 
+        open={sqlDialogOpen} 
+        onClose={() => setSqlDialogOpen(false)} 
+        maxWidth="md" 
+        fullWidth
+      >
+        <DialogTitle>
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <CodeIcon sx={{ color: '#00D4FF' }} />
+              <Typography variant="h6" fontWeight={600}>
+                SQL Schema - {selectedTableSql.name}
+              </Typography>
+            </Stack>
+            <IconButton onClick={() => setSqlDialogOpen(false)}>
+              <CancelIcon />
+            </IconButton>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Paper 
+            sx={{ 
+              p: 3, 
+              bgcolor: '#f8f9fa', 
+              borderRadius: 2,
+              border: '1px solid #e0e0e0',
+              position: 'relative'
+            }}
+          >
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
+                CREATE TABLE Statement
+              </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<CopyIcon />}
+                onClick={handleCopySql}
+                sx={{
+                  textTransform: 'none',
+                  color: copySuccess ? '#4CAF50' : '#00D4FF',
+                  borderColor: copySuccess ? '#4CAF50' : '#00D4FF',
+                  '&:hover': {
+                    borderColor: copySuccess ? '#4CAF50' : '#0099CC',
+                    bgcolor: copySuccess ? 'rgba(76, 175, 80, 0.04)' : 'rgba(0, 212, 255, 0.04)'
+                  }
+                }}
+              >
+                {copySuccess ? 'Copied!' : 'Copy SQL'}
+              </Button>
+            </Stack>
+            <Typography
+              component="pre"
+              sx={{
+                fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
+                fontSize: '14px',
+                lineHeight: 1.5,
+                color: '#333',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                margin: 0,
+                padding: 0
+              }}
+            >
+              {selectedTableSql.sql}
+            </Typography>
+          </Paper>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSqlDialogOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
 
