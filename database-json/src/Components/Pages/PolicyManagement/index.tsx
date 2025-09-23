@@ -35,7 +35,8 @@ import {
 } from './styles';
 
 interface Policy {
-  ownerAddress: string;
+  subject: string;
+  object: string;
   tableName: string;
   policySql: string;
 }
@@ -43,12 +44,13 @@ interface Policy {
 interface PolicyStats {
   totalPolicies: number;
   tablesWithPolicies: string[];
+  querierAddresses: string[];
 }
 
 const PolicyManagement: React.FC = () => {
   const { account: userWalletAddress } = useWeb3();
   const [policies, setPolicies] = useState<Policy[]>([]);
-  const [stats, setStats] = useState<PolicyStats>({ totalPolicies: 0, tablesWithPolicies: [] });
+  const [stats, setStats] = useState<PolicyStats>({ totalPolicies: 0, tablesWithPolicies: [], querierAddresses: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -59,8 +61,9 @@ const PolicyManagement: React.FC = () => {
     message: string;
   }>>([]);
 
-  // Form state
+  // Form state - now includes object_address (querier)
   const [newPolicy, setNewPolicy] = useState({
+    objectAddress: '', // querier address
     tableName: 'patient_data',
     policySql: '',
   });
@@ -73,7 +76,7 @@ const PolicyManagement: React.FC = () => {
     },
     {
       title: "Access by hospital",
-      sql: "SELECT * FROM patient_data WHERE HospitalID = 'H001'"
+      sql: "SELECT * FROM patient_data WHERE HospitalID = 'HOSP-001'"
     },
     {
       title: "Access by condition",
@@ -127,6 +130,7 @@ const PolicyManagement: React.FC = () => {
         setStats({
           totalPolicies: data.policy_count || 0,
           tablesWithPolicies: Array.from(new Set(data.policies?.map((p: Policy) => p.tableName) || [])),
+          querierAddresses: Array.from(new Set(data.policies?.map((p: Policy) => p.object) || [])),
         });
       } else {
         throw new Error(data.message || 'Failed to fetch policies');
@@ -134,7 +138,7 @@ const PolicyManagement: React.FC = () => {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch policies');
       setPolicies([]);
-      setStats({ totalPolicies: 0, tablesWithPolicies: [] });
+      setStats({ totalPolicies: 0, tablesWithPolicies: [], querierAddresses: [] });
     } finally {
       setLoading(false);
     }
@@ -142,7 +146,7 @@ const PolicyManagement: React.FC = () => {
 
   const createPolicy = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userWalletAddress || !newPolicy.policySql.trim()) return;
+    if (!userWalletAddress || !newPolicy.policySql.trim() || !newPolicy.objectAddress.trim()) return;
 
     setIsCreating(true);
     clearMessages();
@@ -152,7 +156,8 @@ const PolicyManagement: React.FC = () => {
         method: 'POST',
         headers: config.REQUEST_CONFIG.HEADERS,
         body: JSON.stringify({
-          wallet_address: userWalletAddress,
+          subject_address: userWalletAddress, // Current wallet as owner/subject
+          object_address: newPolicy.objectAddress, // User-provided querier address
           table_name: newPolicy.tableName,
           policy_sql: newPolicy.policySql.trim(),
         }),
@@ -165,7 +170,7 @@ const PolicyManagement: React.FC = () => {
         showToast('success', 'Policy created successfully!');
         
         // Clear form and refresh
-        setNewPolicy({ tableName: 'patient_data', policySql: '' });
+        setNewPolicy({ objectAddress: '', tableName: 'patient_data', policySql: '' });
         await fetchPolicies(); // Refresh the list
       } else {
         throw new Error(data.message || 'Failed to create policy');
@@ -188,7 +193,7 @@ const PolicyManagement: React.FC = () => {
         method: 'DELETE',
         headers: config.REQUEST_CONFIG.HEADERS,
         body: JSON.stringify({
-          wallet_address: userWalletAddress,
+          object_address: userWalletAddress, // Current wallet as the object for deletion
           policy_index: policyIndex,
         }),
       });
@@ -285,8 +290,8 @@ const PolicyManagement: React.FC = () => {
 
       <PolicyHeader>
         <h2>🔒 Access Policy Management</h2>
-        <p>Manage your data access policies to control what data you can query from the Web3DB.</p>
-        <p><strong>Wallet:</strong> {userWalletAddress}</p>
+        <p>Manage access policies to grant querying permissions to other wallet addresses. As the data owner, you control what data other wallets can access from your tables.</p>
+        <p><strong>Your Wallet (Data Owner):</strong> {userWalletAddress}</p>
       </PolicyHeader>
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -302,12 +307,29 @@ const PolicyManagement: React.FC = () => {
           <h4>{stats.tablesWithPolicies.length}</h4>
           <p>Tables with Access</p>
         </StatsCard>
+        <StatsCard>
+          <h4>{stats.querierAddresses.length}</h4>
+          <p>Authorized Queriers</p>
+        </StatsCard>
       </StatsContainer>
 
       {/* Create New Policy */}
       <PolicyCard>
         <h3>📝 Create New Policy</h3>
+        <p>Create an access policy to grant querying permissions to another wallet address.</p>
         <CreatePolicyForm onSubmit={createPolicy}>
+          <FormGroup>
+            <Label htmlFor="objectAddress">Querier Wallet Address:</Label>
+            <Input
+              id="objectAddress"
+              type="text"
+              value={newPolicy.objectAddress}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPolicy(prev => ({ ...prev, objectAddress: e.target.value }))}
+              placeholder="0x... (wallet address that will be granted access)"
+              required
+            />
+          </FormGroup>
+
           <FormGroup>
             <Label htmlFor="tableName">Table Name:</Label>
             <Input
@@ -332,7 +354,7 @@ const PolicyManagement: React.FC = () => {
             />
           </FormGroup>
 
-          <Button type="submit" disabled={isCreating || !newPolicy.policySql.trim()}>
+          <Button type="submit" disabled={isCreating || !newPolicy.policySql.trim() || !newPolicy.objectAddress.trim()}>
             {isCreating ? <LoadingSpinner /> : '➕ Create Policy'}
           </Button>
         </CreatePolicyForm>
@@ -393,6 +415,12 @@ const PolicyManagement: React.FC = () => {
                   <PolicyIndex>#{index + 1}</PolicyIndex>
                   <div>
                     <PolicyTable>Table: {policy.tableName}</PolicyTable>
+                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>
+                      <strong>Owner:</strong> {policy.subject}
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
+                      <strong>Querier:</strong> {policy.object}
+                    </div>
                     <PolicySql>{policy.policySql}</PolicySql>
                   </div>
                   <DeleteButton
