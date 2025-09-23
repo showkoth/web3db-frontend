@@ -35,6 +35,9 @@ import {
   Switch,
   FormControlLabel,
   Snackbar,
+  Tabs,
+  Tab,
+  Box as MuiBox,
 } from "@mui/material";
 import {
   Storage as DatabaseIcon,
@@ -46,10 +49,10 @@ import {
   Schedule as ScheduleIcon,
   DataObject as DataIcon,
   Add as AddIcon,
-  Edit as EditIcon,
   Delete as DeleteIcon,
   Save as SaveIcon,
   Cancel as CancelIcon,
+  Code as CodeIcon,
 } from "@mui/icons-material";
 import { SqlContext } from "../../../context/SqlContext";
 import { config, buildApiUrl } from "../../../config/config";
@@ -60,14 +63,81 @@ const SeeTables: React.FC = () => {
 
   // State for schema management
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedSchema, setSelectedSchema] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
     severity: 'success'
   });
+
+  // State for DDL input mode
+  const [isFormMode, setIsFormMode] = useState(true);
+  const [ddlInput, setDdlInput] = useState('');
+
+  // Example DDL templates
+  const ddlExamples = [
+    {
+      name: "Patient Data Table",
+      description: "Healthcare patient records",
+      ddl: `CREATE TABLE patient_data (
+  PatientID VARCHAR PRIMARY KEY,
+  Name VARCHAR,
+  Age INTEGER,
+  Gender VARCHAR,
+  BloodType VARCHAR,
+  Condition VARCHAR,
+  VisitDate VARCHAR,
+  Doctor VARCHAR,
+  HospitalID VARCHAR,
+  Prescription VARCHAR,
+  DiagnosisReport VARCHAR
+);`
+    },
+    {
+      name: "User Profile Table",
+      description: "User management system",
+      ddl: `CREATE TABLE user_profiles (
+  UserID VARCHAR PRIMARY KEY,
+  Username VARCHAR,
+  Email VARCHAR,
+  FirstName VARCHAR,
+  LastName VARCHAR,
+  DateOfBirth DATE,
+  CreatedAt TIMESTAMP,
+  IsActive BOOLEAN,
+  ProfilePicture VARCHAR
+);`
+    },
+    {
+      name: "Transaction Records",
+      description: "Financial transaction data",
+      ddl: `CREATE TABLE transactions (
+  TransactionID VARCHAR PRIMARY KEY,
+  UserID VARCHAR,
+  Amount FLOAT,
+  Currency VARCHAR,
+  TransactionType VARCHAR,
+  Status VARCHAR,
+  Timestamp TIMESTAMP,
+  Description VARCHAR,
+  ReferenceID VARCHAR
+);`
+    },
+    {
+      name: "Event Logs",
+      description: "System event tracking",
+      ddl: `CREATE TABLE event_logs (
+  EventID VARCHAR PRIMARY KEY,
+  EventType VARCHAR,
+  UserID VARCHAR,
+  Timestamp TIMESTAMP,
+  IPAddress VARCHAR,
+  UserAgent VARCHAR,
+  EventData VARCHAR,
+  Severity VARCHAR
+);`
+    }
+  ];
 
   // Form state for create/edit schema
   const [schemaForm, setSchemaForm] = useState({
@@ -77,20 +147,105 @@ const SeeTables: React.FC = () => {
     indexes: ['PatientID', 'HospitalID', 'Age']
   });
 
+  // Helper function to parse SQL CREATE TABLE statement into structured data
+  const parseCreateTableSQL = (sql: string) => {
+    try {
+      // Extract column definitions between parentheses
+      const columnsMatch = sql.match(/\(([^)]+)\)/);
+      if (!columnsMatch) return null;
+      
+      const columnDefs = columnsMatch[1].split(',').map(def => def.trim());
+      const columns: Array<{name: string, type: string, nullable: boolean}> = [];
+      const primaryKeys: string[] = [];
+      
+      columnDefs.forEach(def => {
+        // Parse column definition
+        const parts = def.trim().split(/\s+/);
+        const columnName = parts[0];
+        const columnType = parts[1] || 'VARCHAR';
+        const isPrimaryKey = def.toUpperCase().includes('PRIMARY KEY');
+        
+        if (isPrimaryKey) {
+          primaryKeys.push(columnName);
+        }
+        
+        columns.push({
+          name: columnName,
+          type: columnType.toLowerCase(),
+          nullable: !isPrimaryKey // Primary keys are typically not nullable
+        });
+      });
+      
+      return {
+        columns,
+        primary_key: primaryKeys,
+        indexes: primaryKeys // For now, assume primary keys are indexed
+      };
+    } catch (error) {
+      console.error('Error parsing SQL:', error);
+      return null;
+    }
+  };
+
+  // Helper function to convert form data to SQL CREATE TABLE statement
+  const generateCreateTableSQL = (form: typeof schemaForm): string => {
+    const { table_name, columns, primary_key } = form;
+    
+    // Build column definitions
+    const columnDefs = columns.map(col => {
+      let def = `${col.name} `;
+      
+      // Map frontend types to SQL types
+      switch (col.type.toLowerCase()) {
+        case 'string':
+          def += 'VARCHAR';
+          break;
+        case 'integer':
+        case 'int':
+          def += 'INTEGER';
+          break;
+        case 'float':
+        case 'number':
+          def += 'FLOAT';
+          break;
+        case 'boolean':
+        case 'bool':
+          def += 'BOOLEAN';
+          break;
+        case 'date':
+          def += 'DATE';
+          break;
+        case 'datetime':
+        case 'timestamp':
+          def += 'TIMESTAMP';
+          break;
+        default:
+          def += 'VARCHAR';
+      }
+      
+      // Add PRIMARY KEY constraint for primary key columns
+      if (primary_key.includes(col.name)) {
+        def += ' PRIMARY KEY';
+      }
+      
+      return def;
+    }).join(', ');
+    
+    return `CREATE TABLE ${table_name} (${columnDefs})`;
+  };
+
   // API functions for schema management
   const createSchema = async () => {
     setLoading(true);
     try {
+      const schemaSql = generateCreateTableSQL(schemaForm);
+      
       const response = await fetch(buildApiUrl('/schemas'), {
         method: 'POST',
         headers: config.REQUEST_CONFIG.HEADERS,
         body: JSON.stringify({
           table_name: schemaForm.table_name,
-          table_schema: {
-            columns: schemaForm.columns,
-            primary_key: schemaForm.primary_key,
-            indexes: schemaForm.indexes
-          }
+          schema_sql: schemaSql
         })
       });
 
@@ -107,6 +262,48 @@ const SeeTables: React.FC = () => {
       setNotification({ 
         open: true, 
         message: err instanceof Error ? err.message : 'Failed to create schema', 
+        severity: 'error' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Create schema from DDL input
+  const createSchemaFromDDL = async () => {
+    setLoading(true);
+    try {
+      // Extract table name from DDL
+      const tableNameMatch = ddlInput.match(/CREATE\s+TABLE\s+(\w+)/i);
+      const tableName = tableNameMatch?.[1];
+      
+      if (!tableName) {
+        throw new Error('Could not extract table name from DDL. Please ensure your DDL starts with "CREATE TABLE table_name"');
+      }
+
+      const response = await fetch(buildApiUrl('/schemas'), {
+        method: 'POST',
+        headers: config.REQUEST_CONFIG.HEADERS,
+        body: JSON.stringify({
+          table_name: tableName,
+          schema_sql: ddlInput.trim()
+        })
+      });
+
+      const data = await response.json();
+      if (data.status === 'success') {
+        setNotification({ open: true, message: 'Schema created successfully from DDL!', severity: 'success' });
+        setCreateDialogOpen(false);
+        fetchSchemas && fetchSchemas();
+        resetForm();
+        setDdlInput('');
+      } else {
+        throw new Error(data.message || 'Failed to create schema from DDL');
+      }
+    } catch (err) {
+      setNotification({ 
+        open: true, 
+        message: err instanceof Error ? err.message : 'Failed to create schema from DDL', 
         severity: 'error' 
       });
     } finally {
@@ -151,6 +348,8 @@ const SeeTables: React.FC = () => {
       primary_key: [''],
       indexes: ['PatientID', 'HospitalID', 'Age']
     });
+    setDdlInput('');
+    setIsFormMode(true);
   };
 
   const addColumn = () => {
@@ -174,6 +373,11 @@ const SeeTables: React.FC = () => {
         i === index ? { ...col, [field]: value } : col
       )
     }));
+  };
+
+  // Handle DDL example selection
+  const handleExampleSelect = (exampleDdl: string) => {
+    setDdlInput(exampleDdl);
   };
 
   useEffect(() => {
@@ -381,7 +585,10 @@ const SeeTables: React.FC = () => {
                 <CardContent sx={{ textAlign: 'center', py: 3 }}>
                   <DataIcon sx={{ fontSize: 40, color: '#4CAF50', mb: 2 }} />
                   <Typography variant="h4" fontWeight={700} color="primary">
-                    {Object.values(schemas.schemas).reduce((total: number, table: any) => total + table.columns.length, 0)}
+                    {Object.values(schemas.schemas).reduce((total: number, schemaSql: any) => {
+                      const parsed = typeof schemaSql === 'string' ? parseCreateTableSQL(schemaSql) : schemaSql;
+                      return total + (parsed?.columns?.length || 0);
+                    }, 0)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Total Columns
@@ -395,7 +602,10 @@ const SeeTables: React.FC = () => {
                 <CardContent sx={{ textAlign: 'center', py: 3 }}>
                   <SearchIcon sx={{ fontSize: 40, color: '#FF9800', mb: 2 }} />
                   <Typography variant="h4" fontWeight={700} color="primary">
-                    {Object.values(schemas.schemas).reduce((total: number, table: any) => total + table.indexes.length, 0)}
+                    {Object.values(schemas.schemas).reduce((total: number, schemaSql: any) => {
+                      const parsed = typeof schemaSql === 'string' ? parseCreateTableSQL(schemaSql) : schemaSql;
+                      return total + (parsed?.indexes?.length || 0);
+                    }, 0)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Database Indexes
@@ -407,84 +617,86 @@ const SeeTables: React.FC = () => {
 
           {/* Table Schemas */}
           <Stack spacing={3}>
-            {Object.entries(schemas.schemas).map(([tableName, tableData]: [string, any]) => (
-              <Card key={tableName} sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-                <CardContent sx={{ p: 0 }}>
-                  <Accordion defaultExpanded sx={{ boxShadow: 'none' }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      sx={{
-                        bgcolor: 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 153, 204, 0.1) 100%)',
-                        borderRadius: '8px 8px 0 0',
-                        '& .MuiAccordionSummary-content': {
-                          alignItems: 'center'
-                        }
-                      }}
-                    >
-                      <Stack direction="row" alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                        <TableIcon sx={{ color: '#00D4FF' }} />
-                        <Box sx={{ flexGrow: 1 }}>
-                          <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}>
-                            {tableName}
-                          </Typography>
-                          <Stack direction="row" spacing={2}>
-                            <Chip
-                              icon={<DataIcon />}
-                              label={`${tableData.columns.length} columns`}
-                              size="small"
-                              sx={{ bgcolor: 'rgba(76, 175, 80, 0.1)', color: '#4CAF50' }}
-                            />
-                            <Chip
-                              icon={<KeyIcon />}
-                              label={`Primary: ${tableData.primary_key.join(', ')}`}
-                              size="small"
-                              sx={{ bgcolor: 'rgba(255, 152, 0, 0.1)', color: '#FF9800' }}
-                            />
+            {schemas.schemas && Object.entries(schemas.schemas).map(([tableName, schemaSql]: [string, any]) => {
+              // Parse SQL to get structured data for display
+              const parsedSchema = typeof schemaSql === 'string' ? parseCreateTableSQL(schemaSql) : schemaSql;
+              
+              // If parsing fails or schema is empty, skip this table
+              if (!parsedSchema) return null;
+              
+              const tableData = parsedSchema;
+              
+              return (
+                <Card key={tableName} sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+                  <CardContent sx={{ p: 0 }}>
+                    <Accordion sx={{ boxShadow: 'none' }}>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        sx={{
+                          bgcolor: 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 153, 204, 0.1) 100%)',
+                          borderRadius: '8px 8px 0 0',
+                          '& .MuiAccordionSummary-content': {
+                            alignItems: 'center'
+                          }
+                        }}
+                      >
+                        <Stack direction="row" alignItems="center" spacing={2} sx={{ width: '100%' }}>
+                          <TableIcon sx={{ color: '#00D4FF' }} />
+                          <Box sx={{ flexGrow: 1 }}>
+                            <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}>
+                              {tableName}
+                            </Typography>
+                            <Stack direction="row" spacing={2}>
+                              <Chip
+                                icon={<DataIcon />}
+                                label={`${tableData.columns?.length || 0} columns`}
+                                size="small"
+                                sx={{ bgcolor: 'rgba(76, 175, 80, 0.1)', color: '#4CAF50' }}
+                              />
+                              <Chip
+                                icon={<KeyIcon />}
+                                label={`Primary: ${tableData.primary_key?.join(', ') || 'None'}`}
+                                size="small"
+                                sx={{ bgcolor: 'rgba(255, 152, 0, 0.1)', color: '#FF9800' }}
+                              />
+                            </Stack>
+                          </Box>
+                          <Stack direction="row" spacing={1}>
+                            <Tooltip title="View SQL">
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  alert(`SQL Schema for ${tableName}:\n\n${schemaSql}`);
+                                }}
+                                sx={{ 
+                                  bgcolor: 'rgba(76, 175, 80, 0.1)', 
+                                  color: '#4CAF50',
+                                  '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.2)' }
+                                }}
+                              >
+                                <CodeIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Delete Schema">
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteSchema(tableName);
+                                }}
+                                sx={{ 
+                                  bgcolor: 'rgba(244, 67, 54, 0.1)', 
+                                  color: '#f44336',
+                                  '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.2)' }
+                                }}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
                           </Stack>
-                        </Box>
-                        <Stack direction="row" spacing={1}>
-                          <Tooltip title="Edit Schema">
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedSchema({ name: tableName, data: tableData });
-                                setSchemaForm({
-                                  table_name: tableName,
-                                  columns: tableData.columns,
-                                  primary_key: tableData.primary_key,
-                                  indexes: tableData.indexes
-                                });
-                                setEditDialogOpen(true);
-                              }}
-                              sx={{ 
-                                bgcolor: 'rgba(33, 150, 243, 0.1)', 
-                                color: '#2196F3',
-                                '&:hover': { bgcolor: 'rgba(33, 150, 243, 0.2)' }
-                              }}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Delete Schema">
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteSchema(tableName);
-                              }}
-                              sx={{ 
-                                bgcolor: 'rgba(244, 67, 54, 0.1)', 
-                                color: '#f44336',
-                                '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.2)' }
-                              }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
                         </Stack>
-                      </Stack>
-                    </AccordionSummary>
+                      </AccordionSummary>
                     
                     <AccordionDetails sx={{ p: 3 }}>
                       {/* Table Metadata */}
@@ -593,7 +805,8 @@ const SeeTables: React.FC = () => {
                   </Accordion>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </Stack>
         </Box>
       )}
@@ -607,239 +820,231 @@ const SeeTables: React.FC = () => {
           </Stack>
         </DialogTitle>
         <DialogContent>
-          <Stack spacing={3} sx={{ mt: 2 }}>
-            <TextField
-              label="Table Name"
-              value={schemaForm.table_name}
-              onChange={(e) => setSchemaForm(prev => ({ ...prev, table_name: e.target.value }))}
-              placeholder="e.g., patient_data"
-              fullWidth
-              required
-            />
-            
-            <Box>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="h6" fontWeight={600}>Columns</Typography>
-                <Button startIcon={<AddIcon />} onClick={addColumn} size="small">
-                  Add Column
-                </Button>
-              </Stack>
+          {/* Mode Selection Tabs */}
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 1 }}>
+            <Tabs value={isFormMode ? 0 : 1} onChange={(e, newValue) => setIsFormMode(newValue === 0)}>
+              <Tab label="Form Builder" />
+              <Tab label="SQL DDL" />
+            </Tabs>
+          </Box>
+          
+          {/* Form Mode */}
+          {isFormMode ? (
+            <Stack spacing={3} sx={{ mt: 2 }}>
+              <TextField
+                label="Table Name"
+                value={schemaForm.table_name}
+                onChange={(e) => setSchemaForm(prev => ({ ...prev, table_name: e.target.value }))}
+                placeholder="e.g., patient_data"
+                fullWidth
+                required
+              />
               
-              {schemaForm.columns.map((column, index) => (
-                <Paper key={index} sx={{ p: 2, mb: 2, bgcolor: '#f8f9fa' }}>
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} sm={4}>
-                      <TextField
-                        label="Column Name"
-                        value={column.name}
-                        onChange={(e) => updateColumn(index, 'name', e.target.value)}
-                        fullWidth
-                        size="small"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={3}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>Data Type</InputLabel>
-                        <Select
-                          value={column.type}
-                          label="Data Type"
-                          onChange={(e) => updateColumn(index, 'type', e.target.value)}
+              <Box>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                  <Typography variant="h6" fontWeight={600}>Columns</Typography>
+                  <Button startIcon={<AddIcon />} onClick={addColumn} size="small">
+                    Add Column
+                  </Button>
+                </Stack>
+                
+                {schemaForm.columns.map((column, index) => (
+                  <Paper key={index} sx={{ p: 2, mb: 2, bgcolor: '#f8f9fa' }}>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item xs={12} sm={4}>
+                        <TextField
+                          label="Column Name"
+                          value={column.name}
+                          onChange={(e) => updateColumn(index, 'name', e.target.value)}
+                          fullWidth
+                          size="small"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={3}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Data Type</InputLabel>
+                          <Select
+                            value={column.type}
+                            label="Data Type"
+                            onChange={(e) => updateColumn(index, 'type', e.target.value)}
+                          >
+                            <MenuItem value="string">String</MenuItem>
+                            <MenuItem value="integer">Integer</MenuItem>
+                            <MenuItem value="float">Float</MenuItem>
+                            <MenuItem value="boolean">Boolean</MenuItem>
+                            <MenuItem value="datetime">DateTime</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={12} sm={3}>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={column.nullable}
+                              onChange={(e) => updateColumn(index, 'nullable', e.target.checked)}
+                            />
+                          }
+                          label="Nullable"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={2}>
+                        <IconButton 
+                          onClick={() => removeColumn(index)}
+                          disabled={schemaForm.columns.length === 1}
+                          color="error"
                         >
-                          <MenuItem value="string">String</MenuItem>
-                          <MenuItem value="integer">Integer</MenuItem>
-                          <MenuItem value="float">Float</MenuItem>
-                          <MenuItem value="boolean">Boolean</MenuItem>
-                          <MenuItem value="datetime">DateTime</MenuItem>
-                        </Select>
-                      </FormControl>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={3}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={column.nullable}
-                            onChange={(e) => updateColumn(index, 'nullable', e.target.checked)}
-                          />
-                        }
-                        label="Nullable"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={2}>
-                      <IconButton 
-                        onClick={() => removeColumn(index)}
-                        disabled={schemaForm.columns.length === 1}
-                        color="error"
+                  </Paper>
+                ))}
+              </Box>
+
+              <TextField
+                label="Primary Key (comma-separated)"
+                value={schemaForm.primary_key.join(', ')}
+                onChange={(e) => setSchemaForm(prev => ({ 
+                  ...prev, 
+                  primary_key: e.target.value.split(',').map(k => k.trim()).filter(k => k) 
+                }))}
+                placeholder="e.g., PatientID"
+                fullWidth
+                helperText="Enter column names that form the primary key"
+              />
+            </Stack>
+          ) : (
+            /* DDL Mode */
+            <Stack spacing={3} sx={{ mt: 2 }}>
+              <Alert severity="info">
+                Enter your SQL DDL (Data Definition Language) CREATE TABLE statement below. 
+                The table name will be automatically extracted from your DDL.
+              </Alert>
+
+              {/* Example Templates Section */}
+              <Paper sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
+                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>
+                  📋 Quick Start Templates
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Select a template to get started quickly:
+                </Typography>
+                <Grid container spacing={1}>
+                  {ddlExamples.map((example, index) => (
+                    <Grid item xs={12} sm={6} md={3} key={index}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        onClick={() => handleExampleSelect(example.ddl)}
+                        sx={{
+                          textAlign: 'left',
+                          justifyContent: 'flex-start',
+                          textTransform: 'none',
+                          p: 1.5,
+                          height: 'auto',
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          border: '1px solid #e0e0e0',
+                          '&:hover': {
+                            border: '1px solid #00D4FF',
+                            bgcolor: 'rgba(0, 212, 255, 0.04)'
+                          }
+                        }}
                       >
-                        <DeleteIcon />
-                      </IconButton>
+                        <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>
+                          {example.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {example.description}
+                        </Typography>
+                      </Button>
                     </Grid>
-                  </Grid>
-                </Paper>
-              ))}
-            </Box>
+                  ))}
+                </Grid>
+              </Paper>
+              
+              <TextField
+                label="SQL DDL Statement"
+                multiline
+                rows={12}
+                value={ddlInput}
+                onChange={(e) => setDdlInput(e.target.value)}
+                placeholder={`CREATE TABLE patient_data (
+  PatientID VARCHAR PRIMARY KEY,
+  Name VARCHAR,
+  Age INTEGER,
+  Gender VARCHAR,
+  BloodType VARCHAR,
+  Condition VARCHAR,
+  VisitDate VARCHAR,
+  Doctor VARCHAR,
+  HospitalID VARCHAR,
+  Prescription VARCHAR,
+  DiagnosisReport VARCHAR
+);`}
+                fullWidth
+                variant="outlined"
+                sx={{
+                  '& .MuiInputBase-input': {
+                    fontFamily: 'monospace',
+                    fontSize: '14px'
+                  }
+                }}
+                helperText="Write your CREATE TABLE statement or select a template above to get started."
+              />
 
-            <TextField
-              label="Primary Key (comma-separated)"
-              value={schemaForm.primary_key.join(', ')}
-              onChange={(e) => setSchemaForm(prev => ({ 
-                ...prev, 
-                primary_key: e.target.value.split(',').map(k => k.trim()).filter(k => k) 
-              }))}
-              placeholder="e.g., PatientID"
-              fullWidth
-              helperText="Enter column names that form the primary key"
-            />
-
-            <TextField
-              label="Indexes (comma-separated)"
-              value={schemaForm.indexes.join(', ')}
-              onChange={(e) => setSchemaForm(prev => ({ 
-                ...prev, 
-                indexes: e.target.value.split(',').map(k => k.trim()).filter(k => k) 
-              }))}
-              placeholder="e.g., PatientID, HospitalID, Age"
-              fullWidth
-              helperText="Enter column names to be indexed for faster queries"
-            />
-          </Stack>
+              {/* DDL Actions */}
+              {ddlInput && (
+                <Stack direction="row" spacing={2} justifyContent="flex-end">
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setDdlInput('')}
+                    startIcon={<CancelIcon />}
+                  >
+                    Clear
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                      const parsed = parseCreateTableSQL(ddlInput);
+                      if (parsed) {
+                        alert(`Preview:\n\nTable: ${ddlInput.match(/CREATE\s+TABLE\s+(\w+)/i)?.[1] || 'Unknown'}\nColumns: ${parsed.columns.length}\nPrimary Keys: ${parsed.primary_key.join(', ') || 'None'}`);
+                      } else {
+                        alert('Invalid DDL syntax. Please check your CREATE TABLE statement.');
+                      }
+                    }}
+                    startIcon={<CodeIcon />}
+                  >
+                    Preview
+                  </Button>
+                </Stack>
+              )}
+            </Stack>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => { setCreateDialogOpen(false); resetForm(); }} startIcon={<CancelIcon />}>
             Cancel
           </Button>
           <Button 
-            onClick={createSchema} 
+            onClick={isFormMode ? createSchema : createSchemaFromDDL} 
             variant="contained" 
             startIcon={<SaveIcon />}
-            disabled={loading || !schemaForm.table_name || schemaForm.columns.some(col => !col.name)}
+            disabled={
+              loading || 
+              (isFormMode ? 
+                (!schemaForm.table_name || schemaForm.columns.some(col => !col.name)) :
+                !ddlInput.trim()
+              )
+            }
             sx={{
               background: 'linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)',
             }}
           >
             {loading ? 'Creating...' : 'Create Schema'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Edit Schema Dialog */}
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <EditIcon sx={{ color: '#2196F3' }} />
-            <Typography variant="h6" fontWeight={600}>Edit Schema: {selectedSchema?.name}</Typography>
-          </Stack>
-        </DialogTitle>
-        <DialogContent>
-          <Alert severity="info" sx={{ mb: 2 }}>
-            Note: Editing schemas in a production environment should be done carefully as it may affect existing data.
-          </Alert>
-          <Stack spacing={3} sx={{ mt: 2 }}>
-            <TextField
-              label="Table Name"
-              value={schemaForm.table_name}
-              onChange={(e) => setSchemaForm(prev => ({ ...prev, table_name: e.target.value }))}
-              fullWidth
-              disabled // Usually table name shouldn't be editable
-            />
-            
-            <Box>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="h6" fontWeight={600}>Columns</Typography>
-                <Button startIcon={<AddIcon />} onClick={addColumn} size="small">
-                  Add Column
-                </Button>
-              </Stack>
-              
-              {schemaForm.columns.map((column, index) => (
-                <Paper key={index} sx={{ p: 2, mb: 2, bgcolor: '#f8f9fa' }}>
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} sm={4}>
-                      <TextField
-                        label="Column Name"
-                        value={column.name}
-                        onChange={(e) => updateColumn(index, 'name', e.target.value)}
-                        fullWidth
-                        size="small"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={3}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>Data Type</InputLabel>
-                        <Select
-                          value={column.type}
-                          label="Data Type"
-                          onChange={(e) => updateColumn(index, 'type', e.target.value)}
-                        >
-                          <MenuItem value="string">String</MenuItem>
-                          <MenuItem value="integer">Integer</MenuItem>
-                          <MenuItem value="float">Float</MenuItem>
-                          <MenuItem value="boolean">Boolean</MenuItem>
-                          <MenuItem value="datetime">DateTime</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={3}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={column.nullable}
-                            onChange={(e) => updateColumn(index, 'nullable', e.target.checked)}
-                          />
-                        }
-                        label="Nullable"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={2}>
-                      <IconButton 
-                        onClick={() => removeColumn(index)}
-                        disabled={schemaForm.columns.length === 1}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                </Paper>
-              ))}
-            </Box>
-
-            <TextField
-              label="Primary Key (comma-separated)"
-              value={schemaForm.primary_key.join(', ')}
-              onChange={(e) => setSchemaForm(prev => ({ 
-                ...prev, 
-                primary_key: e.target.value.split(',').map(k => k.trim()).filter(k => k) 
-              }))}
-              fullWidth
-              helperText="Enter column names that form the primary key"
-            />
-
-            <TextField
-              label="Indexes (comma-separated)"
-              value={schemaForm.indexes.join(', ')}
-              onChange={(e) => setSchemaForm(prev => ({ 
-                ...prev, 
-                indexes: e.target.value.split(',').map(k => k.trim()).filter(k => k) 
-              }))}
-              fullWidth
-              helperText="Enter column names to be indexed for faster queries"
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => { setEditDialogOpen(false); resetForm(); }} startIcon={<CancelIcon />}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={createSchema} 
-            variant="contained" 
-            startIcon={<SaveIcon />}
-            disabled={loading || !schemaForm.table_name || schemaForm.columns.some(col => !col.name)}
-            sx={{
-              background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)',
-            }}
-          >
-            {loading ? 'Updating...' : 'Update Schema'}
           </Button>
         </DialogActions>
       </Dialog>

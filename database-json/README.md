@@ -7,6 +7,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 Before running the application, you need to configure the backend API URL:
 
 1. Copy the environment template:
+
    ```bash
    cp .env.example .env
    ```
@@ -17,6 +18,46 @@ Before running the application, you need to configure the backend API URL:
    ```
 
 The application will use the environment variable if available, or fall back to the default URL configured in `src/config/config.ts`.
+
+## Recent Updates
+
+### Schema Management Migration (SQL Format)
+
+The application has been updated to work with the new backend schema storage format:
+
+- **Schema Storage**: Schemas are now stored as SQL CREATE TABLE statements instead of JSON objects
+- **Dual Input Modes**: Form Builder for guided creation and SQL DDL for direct SQL input
+- **DDL Templates**: Pre-built templates for common table types (Patient Data, User Profiles, Transactions, Event Logs)
+- **Backward Compatibility**: The frontend handles both new SQL format and legacy JSON format
+- **Enhanced UI**: Added "View SQL" button to see raw SQL schemas
+- **Simplified Interface**: Removed edit functionality - schemas are create-only for better data integrity
+- **Collapsed by Default**: Table cards start collapsed for cleaner interface
+- **New Utilities**: Added SQL parsing and generation utilities in `src/utils/schemaUtils.ts`
+
+For detailed migration information, see [SCHEMA_MIGRATION.md](./SCHEMA_MIGRATION.md).
+
+### Recent UI/UX Improvements
+
+- **Tabbed Interface**: Clean separation between Form Builder and SQL DDL modes
+- **Template Selection**: Quick-start templates with one-click selection
+- **Accordion Behavior**: Tables start collapsed for better overview
+- **Streamlined Forms**: Removed indexes field for simplified schema creation
+- **Enhanced Validation**: Real-time SQL syntax validation and parsing
+- **Monospace Editor**: Improved DDL input with syntax-friendly formatting
+
+## Features
+
+- **Query Interface**: Execute SQL queries against Web3DB with index-based optimization
+- **Schema Management**:
+  - **Form Builder**: User-friendly interface for creating table schemas
+  - **SQL DDL Input**: Direct SQL CREATE TABLE statement input with validation
+  - **Template Library**: Pre-built templates for common use cases
+  - **View-Only**: Browse existing schemas with detailed column information
+  - **Delete Capability**: Remove unwanted schemas
+- **Policy Management**: Manage data access policies with wallet-based authentication
+- **Web3 Integration**: Connect with MetaMask and other Web3 wallets
+- **Responsive Design**: Works on desktop and mobile devices
+- **Smart Contract Storage**: All schemas stored securely in blockchain smart contracts
 
 ## Available Scripts
 
