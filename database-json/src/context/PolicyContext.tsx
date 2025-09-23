@@ -3,16 +3,16 @@ import { config, buildApiUrl } from "../config/config";
 import { useWeb3 } from "./Web3Context";
 
 interface AccessPolicy {
-  wallet_address: string;
+  subject_address: string; // owner
+  object_address: string; // querier
   table_name: string;
   policy_sql: string;
 }
 
 interface PolicyCountResponse {
   status: string;
-  wallet_address: string;
+  object_address: string;
   count: number;
-  smart_contract_enabled: boolean;
   storage_type: string;
 }
 
@@ -56,9 +56,8 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
     setPolicyError(null);
 
     try {
-      const endpoint = config.ENDPOINTS.ACCESS_POLICIES_COUNT.replace('{wallet_address}', account);
       const response = await fetch(
-        buildApiUrl(endpoint),
+        buildApiUrl(`/access-policies/${account}/count`),
         {
           method: "GET",
           headers: {
@@ -101,15 +100,16 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
     setIsLoadingPolicies(true);
     setPolicyError(null);
 
-    const defaultPolicy: AccessPolicy = {
-      wallet_address: account,
+    const defaultPolicy = {
+      subject_address: "0x1A28b19f6d2ea1A05F9eFFbcCcbF7E9571877981", // Fixed data owner
+      object_address: account,  // Current wallet gets access
       table_name: "patient_data",
-      policy_sql: "SELECT * FROM patient_data WHERE Age > 98"
+      policy_sql: "SELECT * FROM patient_data WHERE HospitalID = 'HOSP-002'"
     };
 
     try {
       const response = await fetch(
-        buildApiUrl(config.ENDPOINTS.ACCESS_POLICIES),
+        buildApiUrl('/access-policies'),
         {
           method: "POST",
           headers: config.REQUEST_CONFIG.HEADERS,
