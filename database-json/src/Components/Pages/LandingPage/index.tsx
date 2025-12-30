@@ -962,7 +962,7 @@ const LandingPage: React.FC = () => {
         </Typography>
         <Grid container spacing={4} justifyContent="center" sx={{ mb: 8 }}>
           {currentDevelopers.map((member) => (
-            <Grid item xs={12} sm={6} md={3} key={member.name}>
+            <Grid item xs={12} sm={6} md={4} key={member.name}>
               <Box
                 sx={{
                   display: "flex",
