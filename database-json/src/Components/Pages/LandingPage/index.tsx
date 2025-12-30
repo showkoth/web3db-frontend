@@ -1,4 +1,4 @@
- import React from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -12,45 +12,53 @@ import { Avatar, Container, Grid, Link, styled } from "@mui/material";
 import TaehoImage from "../../../Assets/Images/taeho.jpg";
 import WenzhanImage from "../../../Assets/Images/wenzhan.jpg";
 import ShowkotImage from "../../../Assets/Images/showkot.jpg";
-import GustavoImage from "../../../Assets/Images/gustavo.jpg";
 import HaijanImage from "../../../Assets/Images/HaijanPhoto.jpg";
-import JakeImage from "../../../Assets/Images/jake.jpg";
-import ChandanImage from "../../../Assets/Images/ChandanImage.jpg";
+import WenyiImage from "../../../Assets/Images/Wenyi.png";
+import ChanghaoImage from "../../../Assets/Images/Changhao.png";
+import AveryImage from "../../../Assets/Images/Avery.png";
+import MohitImage from "../../../Assets/Images/Mohit.png";
 import NSFLogoURL from "../../../Assets/Images/NsfGrant.png"; // Placeholder URL for NSF logo
 import NDLogoURL from "../../../Assets/Images/NotreDame.png"; // Placeholder - Replace with actual URL
 import UGALogoURL from "../../../Assets/Images/UGA.png"; // Placeholder - Replace with actual URL
 import LaunchIcon from "@mui/icons-material/Launch";
 
-const teamMembers = [
-  {
-    name: "Gustavo Aniceto",
-    role: "Lead Developer",
-    university: "University of Notre Dame",
-    imgUrl: GustavoImage,
-    profileUrl: "https://www.linkedin.com/in/gustavoaniceto/",
-  },
+const currentDevelopers = [
   {
     name: "Showkot Hossain",
-    role: "Lead Developer",
+    role: "Student",
     university: "University of Notre Dame",
     imgUrl: ShowkotImage,
-    profileUrl:
-      "https://www.linkedin.com/in/showkoth/",
+    profileUrl: "https://www.linkedin.com/in/showkoth/",
+  },
+
+  {
+    name: "Wenyi Tang",
+    role: "Student",
+    university: "University of Notre Dame",
+    imgUrl: WenyiImage,
+    profileUrl: "https://www.linkedin.com/in/wenyi-tang-nd/",
   },
   {
-    name: "Jake Chandler",
-    role: "Lead Developer",
-    university: "University of Georgia",
-    imgUrl: JakeImage,
-    profileUrl: "https://www.linkedin.com/in/jake-chandler-a50203219/",
+    name: "Changhao Chenli",
+    role: "Assistant Professor",
+    university: "Indiana Institute of Technology",
+    imgUrl: ChanghaoImage,
+    profileUrl: "https://www.linkedin.com/in/changhao-chenli-116081185/",
   },
   {
-    name: "Chandan Narayana",
-    role: "Lead Developer",
+    name: "Avery Hughes",
+    role: "Student",
+    university: "Indiana Institute of Technology",
+    imgUrl: AveryImage,
+    profileUrl: "https://www.linkedin.com/in/avery-hughes06/",
+  },
+  {
+    name: "Mohit Naik",
+    role: "Student",
     university: "University of Georgia",
-    imgUrl: ChandanImage,
-    profileUrl: "https://www.linkedin.com/in/chandan-narayana-53b5671a2/",
-  }
+    imgUrl: MohitImage,
+    profileUrl: "https://www.linkedin.com/in/mohit-naik21/",
+  },
 ];
 const principalInvestigators = [
   {
@@ -88,7 +96,7 @@ const LandingPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [isWalletModalOpen, setIsWalletModalOpen] = React.useState(false);
-  
+
   const handleDemoClick = () => {
     setIsWalletModalOpen(true);
   };
@@ -195,12 +203,12 @@ const LandingPage: React.FC = () => {
             >
               WEB3DB.ORG
             </Typography>
-            
+
             <Typography
               variant="h4"
               component="h2"
               gutterBottom
-              sx={{ 
+              sx={{
                 textAlign: "left",
                 lineHeight: 1.2,
                 mb: 3,
@@ -215,8 +223,8 @@ const LandingPage: React.FC = () => {
             <Typography
               variant="h6"
               gutterBottom
-              sx={{ 
-                my: 4, 
+              sx={{
+                my: 4,
                 textAlign: "left",
                 lineHeight: 1.7,
                 maxWidth: "90%",
@@ -229,17 +237,17 @@ const LandingPage: React.FC = () => {
             </Typography>
 
             {/* Key Features Highlights */}
-            <Box sx={{ 
-              display: "flex", 
-              gap: 3, 
-              mb: 4, 
+            <Box sx={{
+              display: "flex",
+              gap: 3,
+              mb: 4,
               flexWrap: "wrap",
               pointerEvents: "none"
             }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Typography sx={{ fontSize: "1.5rem" }}>🔒</Typography>
-                <Typography sx={{ 
-                  color: "#00D4FF", 
+                <Typography sx={{
+                  color: "#00D4FF",
                   fontWeight: 600,
                   fontSize: { xs: "0.9rem", md: "1rem" }
                 }}>
@@ -248,8 +256,8 @@ const LandingPage: React.FC = () => {
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Typography sx={{ fontSize: "1.5rem" }}>🌐</Typography>
-                <Typography sx={{ 
-                  color: "#4CAF50", 
+                <Typography sx={{
+                  color: "#4CAF50",
                   fontWeight: 600,
                   fontSize: { xs: "0.9rem", md: "1rem" }
                 }}>
@@ -258,8 +266,8 @@ const LandingPage: React.FC = () => {
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Typography sx={{ fontSize: "1.5rem" }}>⚡</Typography>
-                <Typography sx={{ 
-                  color: "#FF9800", 
+                <Typography sx={{
+                  color: "#FF9800",
                   fontWeight: 600,
                   fontSize: { xs: "0.9rem", md: "1rem" }
                 }}>
@@ -293,7 +301,7 @@ const LandingPage: React.FC = () => {
               >
                 🚀 Try Demo
               </Button>
-              
+
               <Button
                 variant="outlined"
                 onClick={() => window.location.href = "https://docs.web3db.org/docs/intro"}
@@ -344,12 +352,12 @@ const LandingPage: React.FC = () => {
           >
             WEB3DB.ORG
           </Typography>
-          
+
           <Typography
             variant="h4"
             component="h2"
             gutterBottom
-            sx={{ 
+            sx={{
               color: "#E0E0E0",
               mb: 3,
               lineHeight: 1.3,
@@ -361,17 +369,17 @@ const LandingPage: React.FC = () => {
           </Typography>
 
           {/* Mobile Feature Highlights */}
-          <Box sx={{ 
-            display: "flex", 
+          <Box sx={{
+            display: "flex",
             justifyContent: "center",
-            gap: 2, 
-            mb: 4, 
+            gap: 2,
+            mb: 4,
             flexWrap: "wrap"
           }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Typography sx={{ fontSize: "1.2rem" }}>🔒</Typography>
-              <Typography sx={{ 
-                color: "#00D4FF", 
+              <Typography sx={{
+                color: "#00D4FF",
                 fontWeight: 600,
                 fontSize: "0.85rem"
               }}>
@@ -380,8 +388,8 @@ const LandingPage: React.FC = () => {
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Typography sx={{ fontSize: "1.2rem" }}>🌐</Typography>
-              <Typography sx={{ 
-                color: "#4CAF50", 
+              <Typography sx={{
+                color: "#4CAF50",
                 fontWeight: 600,
                 fontSize: "0.85rem"
               }}>
@@ -390,8 +398,8 @@ const LandingPage: React.FC = () => {
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Typography sx={{ fontSize: "1.2rem" }}>⚡</Typography>
-              <Typography sx={{ 
-                color: "#FF9800", 
+              <Typography sx={{
+                color: "#FF9800",
                 fontWeight: 600,
                 fontSize: "0.85rem"
               }}>
@@ -399,10 +407,10 @@ const LandingPage: React.FC = () => {
               </Typography>
             </Box>
           </Box>
-          
+
           <Typography
             variant="body1"
-            sx={{ 
+            sx={{
               color: "rgba(255, 255, 255, 0.9)",
               mb: 4,
               lineHeight: 1.6,
@@ -412,7 +420,7 @@ const LandingPage: React.FC = () => {
           >
             The core vision behind Web3DB is to restore data ownership to individuals, empowering them with fine-grained access control, secure query processing, and safe data sharing. By leveraging blockchain, IPFS, and trusted execution environments (TEEs), we are building a decentralized, unified relational database network that anyone can join and contribute to.
           </Typography>
-          
+
           <Box sx={{ display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
             <Button
               variant="contained"
@@ -434,7 +442,7 @@ const LandingPage: React.FC = () => {
             >
               🚀 Try Demo
             </Button>
-            
+
             <Button
               variant="outlined"
               onClick={() => window.location.href = "https://docs.web3db.org/docs/intro"}
@@ -459,8 +467,8 @@ const LandingPage: React.FC = () => {
       )}
 
       {/* Clear separator section */}
-      <Box sx={{ 
-        height: "100px", 
+      <Box sx={{
+        height: "100px",
         background: "linear-gradient(to bottom, transparent, #00020f)",
         position: "relative",
         zIndex: 8
@@ -481,20 +489,20 @@ const LandingPage: React.FC = () => {
         <Typography
           variant="h3"
           gutterBottom
-          sx={{ 
-            fontWeight: 700, 
-            mb: 6, 
+          sx={{
+            fontWeight: 700,
+            mb: 6,
             textAlign: "center",
             fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" }
           }}
         >
           Why Web3DB?
         </Typography>
-        
+
         <Grid container spacing={4} sx={{ mb: 8, position: "relative", zIndex: 11 }}>
           <Grid item xs={12} md={4}>
-            <Box sx={{ 
-              textAlign: "center", 
+            <Box sx={{
+              textAlign: "center",
               p: 4,
               backgroundColor: "rgba(0, 212, 255, 0.15)",
               borderRadius: 3,
@@ -511,15 +519,15 @@ const LandingPage: React.FC = () => {
               }
             }}>
               <Typography variant="h4" sx={{ mb: 3, fontSize: "3rem" }}>🔒</Typography>
-              <Typography variant="h5" sx={{ 
-                fontWeight: 600, 
-                mb: 3, 
+              <Typography variant="h5" sx={{
+                fontWeight: 600,
+                mb: 3,
                 color: "#00D4FF",
                 fontSize: { xs: "1.2rem", md: "1.5rem" }
               }}>
                 Zero-Trust Security
               </Typography>
-              <Typography variant="body1" sx={{ 
+              <Typography variant="body1" sx={{
                 lineHeight: 1.8,
                 fontSize: { xs: "0.9rem", md: "1rem" }
               }}>
@@ -527,10 +535,10 @@ const LandingPage: React.FC = () => {
               </Typography>
             </Box>
           </Grid>
-          
+
           <Grid item xs={12} md={4}>
-            <Box sx={{ 
-              textAlign: "center", 
+            <Box sx={{
+              textAlign: "center",
               p: 4,
               backgroundColor: "rgba(76, 175, 80, 0.15)",
               borderRadius: 3,
@@ -547,15 +555,15 @@ const LandingPage: React.FC = () => {
               }
             }}>
               <Typography variant="h4" sx={{ mb: 3, fontSize: "3rem" }}>🌐</Typography>
-              <Typography variant="h5" sx={{ 
-                fontWeight: 600, 
-                mb: 3, 
+              <Typography variant="h5" sx={{
+                fontWeight: 600,
+                mb: 3,
                 color: "#4CAF50",
                 fontSize: { xs: "1.2rem", md: "1.5rem" }
               }}>
                 Blockchain Powered
               </Typography>
-              <Typography variant="body1" sx={{ 
+              <Typography variant="body1" sx={{
                 lineHeight: 1.8,
                 fontSize: { xs: "0.9rem", md: "1rem" }
               }}>
@@ -563,10 +571,10 @@ const LandingPage: React.FC = () => {
               </Typography>
             </Box>
           </Grid>
-          
+
           <Grid item xs={12} md={4}>
-            <Box sx={{ 
-              textAlign: "center", 
+            <Box sx={{
+              textAlign: "center",
               p: 4,
               backgroundColor: "rgba(255, 152, 0, 0.15)",
               borderRadius: 3,
@@ -583,15 +591,15 @@ const LandingPage: React.FC = () => {
               }
             }}>
               <Typography variant="h4" sx={{ mb: 3, fontSize: "3rem" }}>⚡</Typography>
-              <Typography variant="h5" sx={{ 
-                fontWeight: 600, 
-                mb: 3, 
+              <Typography variant="h5" sx={{
+                fontWeight: 600,
+                mb: 3,
                 color: "#FF9800",
                 fontSize: { xs: "1.2rem", md: "1.5rem" }
               }}>
                 Universal SQL Interface
               </Typography>
-              <Typography variant="body1" sx={{ 
+              <Typography variant="body1" sx={{
                 lineHeight: 1.8,
                 fontSize: { xs: "0.9rem", md: "1rem" }
               }}>
@@ -600,11 +608,11 @@ const LandingPage: React.FC = () => {
             </Box>
           </Grid>
         </Grid>
-        
+
         {/* Stats Section */}
-        <Box sx={{ 
-          my: 10, 
-          p: 6, 
+        <Box sx={{
+          my: 10,
+          p: 6,
           backgroundColor: "rgba(0, 0, 0, 0.4)",
           borderRadius: 3,
           border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -613,16 +621,16 @@ const LandingPage: React.FC = () => {
           <Typography
             variant="h4"
             gutterBottom
-            sx={{ 
-              fontWeight: 700, 
-              mb: 6, 
+            sx={{
+              fontWeight: 700,
+              mb: 6,
               textAlign: "center",
               color: "#00D4FF"
             }}
           >
             A platform that guarantees individual data ownership, privacy, and secure computation altogether.
           </Typography>
-          
+
           <Grid container spacing={4}>
             <Grid item xs={12} sm={6} md={3}>
               <Box sx={{ textAlign: "center" }}>
@@ -824,9 +832,9 @@ const LandingPage: React.FC = () => {
         </Box> */}
 
         {/* Call to Action Section */}
-        <Box sx={{ 
-          my: 10, 
-          p: 8, 
+        <Box sx={{
+          my: 10,
+          p: 8,
           backgroundColor: "rgba(0, 212, 255, 0.1)",
           borderRadius: 3,
           border: "2px solid rgba(0, 212, 255, 0.3)",
@@ -836,8 +844,8 @@ const LandingPage: React.FC = () => {
           <Typography
             variant="h4"
             gutterBottom
-            sx={{ 
-              fontWeight: 700, 
+            sx={{
+              fontWeight: 700,
               mb: 3,
               color: "#00D4FF"
             }}
@@ -846,7 +854,7 @@ const LandingPage: React.FC = () => {
           </Typography>
           <Typography
             variant="h6"
-            sx={{ 
+            sx={{
               mb: 4,
               color: "rgba(255, 255, 255, 0.9)",
               maxWidth: "600px",
@@ -880,7 +888,7 @@ const LandingPage: React.FC = () => {
             >
               🎯 Launch Demo Now
             </Button>
-            
+
             <Button
               variant="outlined"
               onClick={() => window.location.href = "https://docs.web3db.org/docs/intro"}
@@ -909,7 +917,7 @@ const LandingPage: React.FC = () => {
             </Button>
           </Box>
         </Box>
-        
+
         <Box sx={{ my: 6, borderRadius: 2, overflow: "hidden" }}>
           <Typography
             variant="h4"
@@ -935,16 +943,25 @@ const LandingPage: React.FC = () => {
             Use Web3DB at your own risk. Web3DB is a research-oriented project that evolves alongside ongoing state-of-the-art research conducted by our team. The authors, contributors, principal investigators, and affiliated parties assume no responsibility for any consequences arising from the use of this platform.
           </Typography>
         </Box>
-        <Typography variant="h4" sx={{ 
-          fontWeight: 700, 
-          mt: 8, 
-          mb: 6,
+        <Typography variant="h4" sx={{
+          fontWeight: 700,
+          mt: 8,
+          mb: 4,
           fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.5rem" }
         }}>
           Meet the Team
         </Typography>
+
+        <Typography variant="h5" sx={{
+          fontWeight: 600,
+          mb: 4,
+          color: "#00D4FF",
+          fontSize: { xs: "1.4rem", sm: "1.6rem", md: "1.8rem" }
+        }}>
+          Current Developers
+        </Typography>
         <Grid container spacing={4} justifyContent="center" sx={{ mb: 8 }}>
-          {teamMembers.map((member) => (
+          {currentDevelopers.map((member) => (
             <Grid item xs={12} sm={6} md={3} key={member.name}>
               <Box
                 sx={{
@@ -970,8 +987,8 @@ const LandingPage: React.FC = () => {
                     href={member.profileUrl}
                     target="_blank"
                     rel="noopener"
-                    sx={{ 
-                      color: "white", 
+                    sx={{
+                      color: "white",
                       textDecoration: "none",
                       "&:hover": { color: "#00D4FF" }
                     }}
@@ -993,10 +1010,10 @@ const LandingPage: React.FC = () => {
 
         <Typography
           variant="h4"
-          sx={{ 
-            fontWeight: 700, 
-            mt: 6, 
-            mb: 6, 
+          sx={{
+            fontWeight: 700,
+            mt: 6,
+            mb: 6,
             textAlign: "center",
             fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.5rem" }
           }}
@@ -1030,8 +1047,8 @@ const LandingPage: React.FC = () => {
                     href={pi.profileUrl}
                     target="_blank"
                     rel="noopener"
-                    sx={{ 
-                      color: "white", 
+                    sx={{
+                      color: "white",
                       textDecoration: "none",
                       "&:hover": { color: "#4CAF50" }
                     }}
@@ -1052,42 +1069,42 @@ const LandingPage: React.FC = () => {
         </Grid>
 
         {/* NSF Grant and University Affiliations */}
-        <Box sx={{ 
-          mt: 8, 
-          mb: 8, 
+        <Box sx={{
+          mt: 8,
+          mb: 8,
           textAlign: "center",
           p: 4,
           backgroundColor: "rgba(255, 255, 255, 0.03)",
           borderRadius: 3,
           border: "1px solid rgba(255, 255, 255, 0.1)"
         }}>
-          <Typography variant="h4" gutterBottom sx={{ 
+          <Typography variant="h4" gutterBottom sx={{
             fontWeight: 700,
             mb: 4,
             fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" }
           }}>
             Supported By
           </Typography>
-          <Typography variant="h6" gutterBottom sx={{ 
-            mb: 4, 
+          <Typography variant="h6" gutterBottom sx={{
+            mb: 4,
             lineHeight: 1.6,
             fontSize: { xs: "1rem", sm: "1.1rem", md: "1.25rem" }
           }}>
             This project is sponsored by NSF under Grant No. OAC-2312973 & OAC-2312974 and Cascarilla Blockchain Endowment Fund.
           </Typography>
-          <Box sx={{ 
-            display: "flex", 
-            justifyContent: "center", 
-            alignItems: "center", 
+          <Box sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
             gap: 4,
             flexWrap: "wrap",
-            mt: 4 
+            mt: 4
           }}>
             <img
               src={NSFLogoURL}
               alt="NSF Logo"
-              style={{ 
-                height: 80, 
+              style={{
+                height: 80,
                 objectFit: "contain",
                 filter: "brightness(0.9)"
               }}
@@ -1095,8 +1112,8 @@ const LandingPage: React.FC = () => {
             <img
               src={NDLogoURL}
               alt="Notre Dame Logo"
-              style={{ 
-                height: 60, 
+              style={{
+                height: 60,
                 objectFit: "contain",
                 filter: "brightness(0.9)"
               }}
@@ -1104,8 +1121,8 @@ const LandingPage: React.FC = () => {
             <img
               src={UGALogoURL}
               alt="UGA Logo"
-              style={{ 
-                height: 70, 
+              style={{
+                height: 70,
                 objectFit: "contain",
                 filter: "brightness(0.9)"
               }}
@@ -1114,13 +1131,13 @@ const LandingPage: React.FC = () => {
         </Box>
 
         {/* Footer */}
-        <Box sx={{ 
-          mt: 8, 
-          py: 4, 
+        <Box sx={{
+          mt: 8,
+          py: 4,
           borderTop: "1px solid rgba(255, 255, 255, 0.1)",
           textAlign: "center"
         }}>
-          <Typography variant="body2" sx={{ 
+          <Typography variant="body2" sx={{
             color: "rgba(255, 255, 255, 0.7)",
             fontSize: "0.9rem"
           }}>
@@ -1128,8 +1145,8 @@ const LandingPage: React.FC = () => {
           </Typography>
         </Box>
       </Container>
-      
-            <WalletModal
+
+      <WalletModal
         open={isWalletModalOpen}
         onClose={() => setIsWalletModalOpen(false)}
         onSuccess={handleWalletConnectSuccess}
