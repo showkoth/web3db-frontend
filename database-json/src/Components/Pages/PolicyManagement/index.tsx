@@ -39,6 +39,7 @@ interface Policy {
   object: string;
   tableName: string;
   policySql: string;
+  object_policy_index?: number;
 }
 
 interface PolicyStats {
@@ -50,6 +51,7 @@ interface PolicyStats {
 const PolicyManagement: React.FC = () => {
   const { account: userWalletAddress } = useWeb3();
   const [policies, setPolicies] = useState<Policy[]>([]);
+  const [grantedPolicies, setGrantedPolicies] = useState<Policy[]>([]);
   const [stats, setStats] = useState<PolicyStats>({ totalPolicies: 0, tablesWithPolicies: [], querierAddresses: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -144,6 +146,24 @@ const PolicyManagement: React.FC = () => {
     }
   }, [userWalletAddress, clearMessages]);
 
+  const fetchGrantedPolicies = useCallback(async () => {
+    if (!userWalletAddress) return;
+    try {
+      const response = await fetch(
+        buildApiUrl(`/access-policies/granted-by/${userWalletAddress}`),
+        { method: 'GET', headers: config.REQUEST_CONFIG.HEADERS }
+      );
+      const data = await response.json();
+      if (data.status === 'success') {
+        setGrantedPolicies(data.policies || []);
+      } else {
+        setGrantedPolicies([]);
+      }
+    } catch {
+      setGrantedPolicies([]);
+    }
+  }, [userWalletAddress]);
+
   const createPolicy = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userWalletAddress || !newPolicy.policySql.trim() || !newPolicy.objectAddress.trim()) return;
@@ -171,7 +191,7 @@ const PolicyManagement: React.FC = () => {
         
         // Clear form and refresh
         setNewPolicy({ objectAddress: '', tableName: 'patient_data', policySql: '' });
-        await fetchPolicies(); // Refresh the list
+        await Promise.all([fetchPolicies(), fetchGrantedPolicies()]); // Refresh both lists
       } else {
         throw new Error(data.message || 'Failed to create policy');
       }
@@ -182,7 +202,7 @@ const PolicyManagement: React.FC = () => {
     }
   };
 
-  const deletePolicy = async (policyIndex: number) => {
+  const deletePolicy = async (policyIndex: number, objectAddress?: string) => {
     if (!userWalletAddress) return;
 
     setLoading(true);
@@ -193,7 +213,7 @@ const PolicyManagement: React.FC = () => {
         method: 'DELETE',
         headers: config.REQUEST_CONFIG.HEADERS,
         body: JSON.stringify({
-          object_address: userWalletAddress, // Current wallet as the object for deletion
+          object_address: objectAddress || userWalletAddress,
           policy_index: policyIndex,
         }),
       });
@@ -202,7 +222,7 @@ const PolicyManagement: React.FC = () => {
 
       if (data.status === 'success') {
         showToast('success', 'Policy deleted successfully!');
-        await fetchPolicies(); // Refresh the list
+        await Promise.all([fetchPolicies(), fetchGrantedPolicies()]); // Refresh both lists
       } else {
         throw new Error(data.message || 'Failed to delete policy');
       }
@@ -234,7 +254,7 @@ const PolicyManagement: React.FC = () => {
 
       if (data.status === 'success') {
         showToast('success', 'All policies deleted successfully!');
-        await fetchPolicies(); // Refresh the list
+        await Promise.all([fetchPolicies(), fetchGrantedPolicies()]); // Refresh both lists
       } else {
         throw new Error(data.message || 'Failed to delete all policies');
       }
@@ -252,8 +272,9 @@ const PolicyManagement: React.FC = () => {
   useEffect(() => {
     if (userWalletAddress) {
       fetchPolicies();
+      fetchGrantedPolicies();
     }
-  }, [userWalletAddress, fetchPolicies]);
+  }, [userWalletAddress, fetchPolicies, fetchGrantedPolicies]);
 
   useEffect(() => {
     const timer = setTimeout(clearMessages, 5000);
@@ -381,14 +402,14 @@ const PolicyManagement: React.FC = () => {
       {/* Existing Policies */}
       <PolicyCard>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h3>📋 Your Access Policies ({stats.totalPolicies})</h3>
+          <h3>Your Access Policies ({stats.totalPolicies})</h3>
           {stats.totalPolicies > 0 && (
             <ActionButtons>
               <Button onClick={fetchPolicies} disabled={loading}>
-                🔄 Refresh
+                Refresh
               </Button>
               <DeleteButton onClick={deleteAllPolicies} disabled={loading}>
-                🗑️ Delete All
+                Delete All
               </DeleteButton>
             </ActionButtons>
           )}
@@ -402,7 +423,7 @@ const PolicyManagement: React.FC = () => {
 
         {!loading && policies.length === 0 && (
           <EmptyState>
-            <p>🔍 No access policies found.</p>
+            <p>No access policies found.</p>
             <p>Create your first policy above to start accessing data.</p>
           </EmptyState>
         )}
@@ -428,7 +449,56 @@ const PolicyManagement: React.FC = () => {
                     disabled={loading}
                     title="Delete this policy"
                   >
-                    🗑️
+                    Delete
+                  </DeleteButton>
+                </PolicyContent>
+              </PolicyItem>
+            ))}
+          </PolicyList>
+        )}
+      </PolicyCard>
+
+      {/* Policies the wallet has granted to others */}
+      <PolicyCard>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h3>Policies You Granted ({grantedPolicies.length})</h3>
+          <ActionButtons>
+            <Button onClick={fetchGrantedPolicies} disabled={loading}>
+              Refresh
+            </Button>
+          </ActionButtons>
+        </div>
+
+        {grantedPolicies.length === 0 && (
+          <EmptyState>
+            <p>You have not granted any policies to other wallets.</p>
+          </EmptyState>
+        )}
+
+        {grantedPolicies.length > 0 && (
+          <PolicyList>
+            {grantedPolicies.map((policy, index) => (
+              <PolicyItem key={`granted-${index}`}>
+                <PolicyContent>
+                  <PolicyIndex>#{index + 1}</PolicyIndex>
+                  <div>
+                    <PolicyTable>Table: {policy.tableName}</PolicyTable>
+                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>
+                      <strong>Owner:</strong> {policy.subject}
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
+                      <strong>Querier:</strong> {policy.object}
+                    </div>
+                    <PolicySql>{policy.policySql}</PolicySql>
+                  </div>
+                  <DeleteButton
+                    onClick={() => policy.object_policy_index !== undefined
+                      ? deletePolicy(policy.object_policy_index, policy.object)
+                      : showToast('error', 'Cannot resolve policy index for delete')}
+                    disabled={loading || policy.object_policy_index === undefined}
+                    title="Revoke this granted policy"
+                  >
+                    Revoke
                   </DeleteButton>
                 </PolicyContent>
               </PolicyItem>
