@@ -23,6 +23,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from '@mui/material';
 import {
   CloudUpload as UploadIcon,
@@ -61,9 +62,19 @@ const DataUpload: React.FC = () => {
   });
 
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [tableName, setTableName] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const isValidTableName = /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(tableName);
+
   const handleFileSelect = () => {
+    if (!isValidTableName) {
+      setUploadState(prev => ({
+        ...prev,
+        error: 'Enter a valid table name (letters, numbers, underscores; cannot start with a number) before selecting a file.',
+      }));
+      return;
+    }
     fileInputRef.current?.click();
   };
 
@@ -125,7 +136,7 @@ const DataUpload: React.FC = () => {
           reject(new Error('Network error during upload'));
         };
 
-        xhr.open('POST', buildApiUrl('/upload/patient-data'));
+        xhr.open('POST', buildApiUrl(`/upload/${tableName}`));
         
         // Add headers from config if needed
         Object.entries(config.REQUEST_CONFIG.HEADERS).forEach(([key, value]) => {
@@ -219,7 +230,25 @@ const DataUpload: React.FC = () => {
                   <Typography variant="h6" fontWeight={600} sx={{ mb: 3 }}>
                     Select File to Upload
                   </Typography>
-                  
+
+                  <TextField
+                    fullWidth
+                    required
+                    label="Table Name"
+                    placeholder="e.g., patient_data"
+                    value={tableName}
+                    onChange={(e) => setTableName(e.target.value.trim())}
+                    error={tableName.length > 0 && !isValidTableName}
+                    helperText={
+                      tableName.length === 0
+                        ? 'Required. Letters, numbers, underscores; cannot start with a number.'
+                        : !isValidTableName
+                        ? 'Invalid name. Use letters, numbers, underscores; cannot start with a number.'
+                        : 'Will POST to /upload/' + tableName
+                    }
+                    sx={{ mb: 3 }}
+                  />
+
                   {/* File Drop Zone */}
                   <Paper
                     sx={{
@@ -227,12 +256,13 @@ const DataUpload: React.FC = () => {
                       borderRadius: 2,
                       p: 6,
                       textAlign: 'center',
-                      bgcolor: 'rgba(0, 212, 255, 0.05)',
-                      cursor: 'pointer',
+                      bgcolor: isValidTableName ? 'rgba(0, 212, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
+                      cursor: isValidTableName ? 'pointer' : 'not-allowed',
+                      opacity: isValidTableName ? 1 : 0.6,
                       transition: 'all 0.3s ease',
                       '&:hover': {
-                        bgcolor: 'rgba(0, 212, 255, 0.1)',
-                        borderColor: '#0099CC',
+                        bgcolor: isValidTableName ? 'rgba(0, 212, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)',
+                        borderColor: isValidTableName ? '#0099CC' : '#00D4FF',
                       }
                     }}
                     onClick={handleFileSelect}
