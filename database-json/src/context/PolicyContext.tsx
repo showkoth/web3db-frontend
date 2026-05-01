@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode, useCallback, useEffect } from "react";
+import React, { createContext, useState, ReactNode, useCallback, useEffect, useRef } from "react";
 import { config, buildApiUrl } from "../config/config";
 import { useWeb3 } from "./Web3Context";
 
@@ -41,7 +41,8 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
   const [isLoadingPolicies, setIsLoadingPolicies] = useState<boolean>(false);
   const [policyError, setPolicyError] = useState<string | null>(null);
   const [hasFetchedPolicyCount, setHasFetchedPolicyCount] = useState<boolean>(false);
-  
+  const defaultPolicyInFlightFor = useRef<string | null>(null);
+
   // Get wallet address from Web3Context
   const { account, isConnected } = useWeb3();
 
@@ -104,7 +105,7 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
       subject_address: "0x1A28b19f6d2ea1A05F9eFFbcCcbF7E9571877981", // Fixed data owner
       object_address: account,  // Current wallet gets access
       table_name: "patient_data",
-      policy_sql: "SELECT * FROM patient_data WHERE HospitalID = 'HOSP-002'"
+      policy_sql: "SELECT * FROM patient_data"
     };
 
     try {
@@ -213,7 +214,16 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
 
   // Effect to create default policy if count is 0
   useEffect(() => {
-    if (account && isConnected && hasFetchedPolicyCount && policyCount === 0 && !isLoadingPolicies && !policyError) {
+    if (
+      account &&
+      isConnected &&
+      hasFetchedPolicyCount &&
+      policyCount === 0 &&
+      !isLoadingPolicies &&
+      !policyError &&
+      defaultPolicyInFlightFor.current !== account
+    ) {
+      defaultPolicyInFlightFor.current = account;
       console.log("No policies found for user, creating default policy...");
       createDefaultPolicy();
     }
@@ -237,6 +247,7 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
       setPolicies([]);
       setPolicyError(null);
       setHasFetchedPolicyCount(false);
+      defaultPolicyInFlightFor.current = null;
     }
   }, [account, isConnected, hasFetchedPolicyCount, initializePoliciesForUser]);
 
