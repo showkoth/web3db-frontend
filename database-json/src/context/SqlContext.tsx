@@ -12,6 +12,7 @@ type SqlState = {
   schemas: any;
   fetchSchemas: () => void;
   schemasLoading: boolean;
+  accessibleCount: number | null;
 };
 
 const initialContext: Partial<SqlState> = {
@@ -23,6 +24,7 @@ const initialContext: Partial<SqlState> = {
   schemas: null,
   fetchSchemas: () => {},
   schemasLoading: false,
+  accessibleCount: null,
 };
 
 export const SqlContext = createContext<Partial<SqlState>>(initialContext);
@@ -38,6 +40,7 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const [schemas, setSchemas] = useState<any>(null);
   const [schemasLoading, setSchemasLoading] = useState<boolean>(false);
+  const [accessibleCount, setAccessibleCount] = useState<number | null>(null);
   
   // Get wallet address from Web3Context
   const { account } = useWeb3();
@@ -50,6 +53,7 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
     setMessage(null);
     setError(null);
     setResults(null);
+    setAccessibleCount(null);
 
     const requestBody = {
       index_attribute: indexAttribute,
@@ -76,6 +80,7 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
 
       // Update state with response data based on your API structure
       setResults(data.results || []); // Your API returns results in 'results' field
+      setAccessibleCount(typeof data.accessible_count === 'number' ? data.accessible_count : null);
       setMessage(`Query executed successfully. Found ${data.records} record(s) from ${data.cids} CID(s). Execution time: ${data.total_query_execution_time_seconds?.toFixed(4)}s`);
       setError(null);
     } catch (err) {
@@ -97,6 +102,7 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
       // Clear results on error
       setResults(null);
       setMessage(null);
+      setAccessibleCount(null);
     }
   };
 
@@ -146,7 +152,7 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
 
   return (
     <SqlContext.Provider
-      value={{ query, results, runQuery, message, error, schemas, fetchSchemas, schemasLoading }}
+      value={{ query, results, runQuery, message, error, schemas, fetchSchemas, schemasLoading, accessibleCount }}
     >
       {children}
     </SqlContext.Provider>

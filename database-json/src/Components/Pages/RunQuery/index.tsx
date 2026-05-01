@@ -54,6 +54,7 @@ const RunQuery: React.FC = () => {
     results,
     message,
     error: sqlError,
+    accessibleCount,
   } = useContext(SqlContext);
   
   const { isConnected, account } = useWeb3();
@@ -390,8 +391,9 @@ const RunQuery: React.FC = () => {
         
         {/* Data Access Visualization */}
         {isConnected && (
-          <DataAccessVisualization 
-            currentResultsCount={results ? results.length : 0}
+          <DataAccessVisualization
+            returnedCount={results ? results.length : 0}
+            accessibleCount={accessibleCount ?? null}
             isQueryExecuted={results !== null}
           />
         )}

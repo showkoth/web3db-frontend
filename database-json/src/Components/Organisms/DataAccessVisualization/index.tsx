@@ -22,7 +22,10 @@ import {
 import { buildApiUrl } from '../../../config/config';
 
 interface DataAccessVisualizationProps {
-  currentResultsCount?: number;
+  /** Rows the current query returned (after LIMIT/WHERE) */
+  returnedCount?: number;
+  /** Rows wallet's policies grant access to (independent of query) */
+  accessibleCount?: number | null;
   isQueryExecuted?: boolean;
 }
 
@@ -34,7 +37,8 @@ interface TotalDataResponse {
 }
 
 const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
-  currentResultsCount = 0,
+  returnedCount = 0,
+  accessibleCount = null,
   isQueryExecuted = false,
 }) => {
   const [totalRows, setTotalRows] = useState<number>(0);
@@ -83,15 +87,11 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
     }
   }, [hasFetched]);
 
-  const calculateAccessPercentage = () => {
-    const safeTotal = totalRows || 0;
-    const safeCount = currentResultsCount || 0;
-    if (safeTotal === 0) return 0;
-    return Math.min((safeCount / safeTotal) * 100, 100);
-  };
-
-  const accessPercentage = calculateAccessPercentage();
-  const restrictedCount = Math.max((totalRows || 0) - (currentResultsCount || 0), 0);
+  const safeTotal = totalRows || 0;
+  const safeAccessible = accessibleCount ?? 0;
+  const safeReturned = returnedCount || 0;
+  const accessPercentage = safeTotal === 0 ? 0 : Math.min((safeAccessible / safeTotal) * 100, 100);
+  const restrictedCount = Math.max(safeTotal - safeAccessible, 0);
 
   const getAccessLevel = () => {
     if (accessPercentage === 0) return { label: 'No Access', color: '#f44336', icon: <VisibilityOffIcon /> };
@@ -190,7 +190,7 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
                   Accessible Data
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {(currentResultsCount || 0).toLocaleString()} / {(totalRows || 0).toLocaleString()} records
+                  {safeAccessible.toLocaleString()} / {safeTotal.toLocaleString()} records
                 </Typography>
               </Box>
               
@@ -212,24 +212,43 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
             </Box>
 
             {/* Data Breakdown */}
-            <Stack direction="row" spacing={2} flexWrap="wrap">
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              <Chip
+                icon={<DataUsageIcon />}
+                label={`${safeReturned.toLocaleString()} Returned`}
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(33, 150, 243, 0.1)',
+                  color: '#2196f3',
+                  fontWeight: 600
+                }}
+              />
               <Chip
                 icon={<VisibilityIcon />}
-                label={`${(currentResultsCount || 0).toLocaleString()} Accessible`}
+                label={`${safeAccessible.toLocaleString()} Accessible`}
                 size="small"
-                sx={{ 
-                  bgcolor: 'rgba(76, 175, 80, 0.1)', 
+                sx={{
+                  bgcolor: 'rgba(76, 175, 80, 0.1)',
                   color: '#4CAF50',
                   fontWeight: 600
                 }}
               />
               <Chip
                 icon={<LockIcon />}
-                label={`${(restrictedCount || 0).toLocaleString()} Restricted`}
+                label={`${restrictedCount.toLocaleString()} Restricted`}
                 size="small"
-                sx={{ 
-                  bgcolor: 'rgba(244, 67, 54, 0.1)', 
+                sx={{
+                  bgcolor: 'rgba(244, 67, 54, 0.1)',
                   color: '#f44336',
+                  fontWeight: 600
+                }}
+              />
+              <Chip
+                label={`${safeTotal.toLocaleString()} Total`}
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(0, 0, 0, 0.06)',
+                  color: 'text.primary',
                   fontWeight: 600
                 }}
               />
@@ -249,9 +268,9 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
             }}
           >
             <Typography variant="body2">
-              <strong>Access Control Active:</strong> Due to your wallet's access policies, 
-              you can currently view {(currentResultsCount || 0).toLocaleString()} out of {(totalRows || 0).toLocaleString()} total records 
-              ({accessPercentage.toFixed(1)}% of available data).
+              <strong>Access Control Active:</strong> Query returned {safeReturned.toLocaleString()} record(s).
+              Wallet policies grant access to {safeAccessible.toLocaleString()} of {safeTotal.toLocaleString()} total
+              ({accessPercentage.toFixed(1)}%).
             </Typography>
           </Alert>
         )}
