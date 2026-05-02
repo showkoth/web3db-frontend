@@ -91,7 +91,6 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
   const safeAccessible = accessibleCount ?? 0;
   const safeReturned = returnedCount || 0;
   const accessPercentage = safeTotal === 0 ? 0 : Math.min((safeAccessible / safeTotal) * 100, 100);
-  const restrictedCount = Math.max(safeTotal - safeAccessible, 0);
 
   const getAccessLevel = () => {
     if (accessPercentage === 0) return { label: 'No Access', color: '#f44336', icon: <VisibilityOffIcon /> };
@@ -230,16 +229,6 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
                 sx={{
                   bgcolor: 'rgba(76, 175, 80, 0.1)',
                   color: '#4CAF50',
-                  fontWeight: 600
-                }}
-              />
-              <Chip
-                icon={<LockIcon />}
-                label={`${restrictedCount.toLocaleString()} Restricted`}
-                size="small"
-                sx={{
-                  bgcolor: 'rgba(244, 67, 54, 0.1)',
-                  color: '#f44336',
                   fontWeight: 600
                 }}
               />
