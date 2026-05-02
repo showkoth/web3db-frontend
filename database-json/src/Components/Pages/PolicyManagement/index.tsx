@@ -22,8 +22,6 @@ import {
   PolicyIndex,
   PolicyTable,
   PolicySql,
-  StatsCard,
-  StatsContainer,
   ExampleQueries,
   ExampleQuery,
   ActionButtons,
@@ -317,23 +315,7 @@ const PolicyManagement: React.FC = () => {
       {error && <ErrorMessage>{error}</ErrorMessage>}
       {success && <SuccessMessage>{success}</SuccessMessage>}
 
-      {/* Statistics */}
-      <StatsContainer>
-        <StatsCard>
-          <h4>{stats.totalPolicies}</h4>
-          <p>Total Policies</p>
-        </StatsCard>
-        <StatsCard>
-          <h4>{stats.tablesWithPolicies.length}</h4>
-          <p>Tables with Access</p>
-        </StatsCard>
-        <StatsCard>
-          <h4>{stats.querierAddresses.length}</h4>
-          <p>Authorized Wallets</p>
-        </StatsCard>
-      </StatsContainer>
-
-      {/* Create New Policy */}
+{/* Create New Policy */}
       <PolicyCard>
         <h3>📝 Create New Policy</h3>
         <p>Create an access policy to grant querying permissions to another wallet address.</p>
