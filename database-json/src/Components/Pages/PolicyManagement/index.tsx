@@ -94,7 +94,7 @@ const PolicyManagement: React.FC = () => {
   const showToast = useCallback((type: 'success' | 'error', message: string) => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, type, message }]);
-    
+
     // Auto remove toast after 5 seconds
     setTimeout(() => {
       setToasts(prev => prev.filter(toast => toast.id !== id));
@@ -188,7 +188,7 @@ const PolicyManagement: React.FC = () => {
       if (data.status === 'success') {
         // Show success toast notification
         showToast('success', 'Policy created successfully!');
-        
+
         // Clear form and refresh
         setNewPolicy({ objectAddress: '', tableName: 'patient_data', policySql: '' });
         await Promise.all([fetchPolicies(), fetchGrantedPolicies()]); // Refresh both lists
@@ -311,8 +311,7 @@ const PolicyManagement: React.FC = () => {
 
       <PolicyHeader>
         <h2>🔒 Access Policy Management</h2>
-        <p>Manage access policies to grant querying permissions to other wallet addresses. As the data owner, you control what data other wallets can access from your tables.</p>
-        <p><strong>Your Wallet (Data Owner):</strong> {userWalletAddress}</p>
+        <p><strong>Your Wallet:</strong> {userWalletAddress}</p>
       </PolicyHeader>
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -362,7 +361,7 @@ const PolicyManagement: React.FC = () => {
               required
             />
           </FormGroup>
-          
+
           <FormGroup>
             <Label htmlFor="policySql">Policy SQL Query:</Label>
             <TextArea
