@@ -329,7 +329,7 @@ const PolicyManagement: React.FC = () => {
         </StatsCard>
         <StatsCard>
           <h4>{stats.querierAddresses.length}</h4>
-          <p>Authorized Queriers</p>
+          <p>Authorized Wallets</p>
         </StatsCard>
       </StatsContainer>
 
