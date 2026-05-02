@@ -198,8 +198,7 @@ const SeeTables: React.FC = () => {
 
   // Fetch per-table owner counts whenever schema list changes
   useEffect(() => {
-    if (!schemas) return;
-    const tableNames = Object.keys(schemas);
+    const tableNames = Object.keys(schemas?.schemas || {});
     if (tableNames.length === 0) return;
 
     let cancelled = false;
