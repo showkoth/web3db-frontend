@@ -82,11 +82,11 @@ const SeeTables: React.FC = () => {
       // Extract column definitions between parentheses
       const columnsMatch = sql.match(/\(([^)]+)\)/);
       if (!columnsMatch) return null;
-      
+
       const columnDefs = columnsMatch[1].split(',').map(def => def.trim());
-      const columns: Array<{name: string, type: string, nullable: boolean}> = [];
+      const columns: Array<{ name: string, type: string, nullable: boolean }> = [];
       const primaryKeys: string[] = [];
-      
+
       columnDefs.forEach(def => {
         // Parse column definition
         const parts = def.trim().split(/\s+/);
@@ -94,21 +94,21 @@ const SeeTables: React.FC = () => {
         const columnType = parts[1] || 'VARCHAR';
         const isPrimaryKey = def.toUpperCase().includes('PRIMARY KEY');
         const hasNotNull = def.toUpperCase().includes('NOT NULL');
-        
+
         if (isPrimaryKey) {
           primaryKeys.push(columnName);
         }
-        
+
         // A column is nullable if it's NOT a primary key AND doesn't have NOT NULL constraint
         const isNullable = !isPrimaryKey && !hasNotNull;
-        
+
         columns.push({
           name: columnName,
           type: columnType.toLowerCase(),
           nullable: isNullable
         });
       });
-      
+
       return {
         columns,
         primary_key: primaryKeys,
@@ -143,10 +143,10 @@ const SeeTables: React.FC = () => {
         throw new Error(data.message || 'Failed to delete schema');
       }
     } catch (err) {
-      setNotification({ 
-        open: true, 
-        message: err instanceof Error ? err.message : 'Failed to delete schema', 
-        severity: 'error' 
+      setNotification({
+        open: true,
+        message: err instanceof Error ? err.message : 'Failed to delete schema',
+        severity: 'error'
       });
     } finally {
       setLoading(false);
@@ -229,11 +229,11 @@ const SeeTables: React.FC = () => {
       <Box sx={{ mb: 4 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
           <Box>
-            <Typography 
-              variant="h3" 
-              fontWeight={700} 
-              sx={{ 
-                mb: 2, 
+            <Typography
+              variant="h3"
+              fontWeight={700}
+              sx={{
+                mb: 2,
                 color: '#1a1a1a',
                 display: 'flex',
                 alignItems: 'center',
@@ -244,17 +244,17 @@ const SeeTables: React.FC = () => {
               Database Schemas
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-              Explore the structure and metadata of your Web3DB decentralized database tables.
+              Explore the schemas and metadata of the tables in Web3DB.
             </Typography>
           </Box>
-          
+
           <Stack direction="row" spacing={2}>
             <Tooltip title="Refresh Schemas">
-              <IconButton 
-                onClick={handleRefresh} 
+              <IconButton
+                onClick={handleRefresh}
                 disabled={schemasLoading}
-                sx={{ 
-                  bgcolor: 'white', 
+                sx={{
+                  bgcolor: 'white',
                   border: '1px solid #e0e0e0',
                   '&:hover': { bgcolor: '#f5f5f5' }
                 }}
@@ -297,18 +297,18 @@ const SeeTables: React.FC = () => {
 
       {/* Error State */}
       {error && (
-        <Alert 
-          severity="error" 
-          sx={{ 
+        <Alert
+          severity="error"
+          sx={{
             borderRadius: 2,
             mb: 3,
             backgroundColor: 'rgba(255, 87, 87, 0.1)',
             border: '1px solid rgba(255, 87, 87, 0.3)'
           }}
           action={
-            <Button 
-              color="inherit" 
-              size="small" 
+            <Button
+              color="inherit"
+              size="small"
               onClick={handleRefresh}
               startIcon={<RefreshIcon />}
             >
@@ -336,8 +336,8 @@ const SeeTables: React.FC = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
               No database schemas found. Try refreshing to load the latest data.
             </Typography>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               onClick={handleRefresh}
               startIcon={<RefreshIcon />}
               sx={{
@@ -369,7 +369,7 @@ const SeeTables: React.FC = () => {
                 </CardContent>
               </Card>
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <Card sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', height: '100%' }}>
                 <CardContent sx={{ textAlign: 'center', py: 3 }}>
@@ -386,7 +386,7 @@ const SeeTables: React.FC = () => {
                 </CardContent>
               </Card>
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <Card sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', height: '100%' }}>
                 <CardContent sx={{ textAlign: 'center', py: 3 }}>
@@ -410,12 +410,12 @@ const SeeTables: React.FC = () => {
             {schemas.schemas && Object.entries(schemas.schemas).map(([tableName, schemaSql]: [string, any]) => {
               // Parse SQL to get structured data for display
               const parsedSchema = typeof schemaSql === 'string' ? parseCreateTableSQL(schemaSql) : schemaSql;
-              
+
               // If parsing fails or schema is empty, skip this table
               if (!parsedSchema) return null;
-              
+
               const tableData = parsedSchema;
-              
+
               return (
                 <Card key={tableName} sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
                   <CardContent sx={{ p: 0 }}>
@@ -459,8 +459,8 @@ const SeeTables: React.FC = () => {
                                   e.stopPropagation();
                                   handleViewSql(tableName, schemaSql);
                                 }}
-                                sx={{ 
-                                  bgcolor: 'rgba(76, 175, 80, 0.1)', 
+                                sx={{
+                                  bgcolor: 'rgba(76, 175, 80, 0.1)',
                                   color: '#4CAF50',
                                   '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.2)' }
                                 }}
@@ -475,8 +475,8 @@ const SeeTables: React.FC = () => {
                                   e.stopPropagation();
                                   deleteSchema(tableName);
                                 }}
-                                sx={{ 
-                                  bgcolor: 'rgba(244, 67, 54, 0.1)', 
+                                sx={{
+                                  bgcolor: 'rgba(244, 67, 54, 0.1)',
                                   color: '#f44336',
                                   '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.2)' }
                                 }}
@@ -487,114 +487,114 @@ const SeeTables: React.FC = () => {
                           </Stack>
                         </Stack>
                       </AccordionSummary>
-                    
-                    <AccordionDetails sx={{ p: 3 }}>
-                      {/* Table Metadata */}
-                      <Grid container spacing={3} sx={{ mb: 3 }}>
-                        <Grid item xs={12} md={6}>
-                          <Paper sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
-                            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-                              Primary Key
-                            </Typography>
-                            <Stack direction="row" spacing={1} flexWrap="wrap">
-                              {tableData.primary_key.map((key: string, index: number) => (
-                                <Chip
-                                  key={index}
-                                  icon={<KeyIcon />}
-                                  label={key}
-                                  size="small"
-                                  sx={{ bgcolor: '#fff3cd', color: '#856404' }}
-                                />
-                              ))}
-                            </Stack>
-                          </Paper>
-                        </Grid>
-                        
-                        <Grid item xs={12} md={6}>
-                          <Paper sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
-                            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-                              Indexes
-                            </Typography>
-                            <Stack direction="row" spacing={1} flexWrap="wrap">
-                              {tableData.indexes.map((index: string, idx: number) => (
-                                <Chip
-                                  key={idx}
-                                  icon={<SearchIcon />}
-                                  label={index}
-                                  size="small"
-                                  sx={{ bgcolor: '#d1ecf1', color: '#0c5460' }}
-                                />
-                              ))}
-                            </Stack>
-                          </Paper>
-                        </Grid>
-                      </Grid>
 
-                      {/* Columns Table */}
-                      <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                        Column Structure
-                      </Typography>
-                      
-                      <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                        <Table>
-                          <TableHead>
-                            <TableRow sx={{ bgcolor: '#f5f5f5' }}>
-                              <TableCell sx={{ fontWeight: 700, color: '#333' }}>Column Name</TableCell>
-                              <TableCell sx={{ fontWeight: 700, color: '#333' }}>Data Type</TableCell>
-                              <TableCell sx={{ fontWeight: 700, color: '#333', textAlign: 'center' }}>Nullable</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {tableData.columns.map((column: any, index: number) => (
-                              <TableRow
-                                key={index}
-                                hover
-                                sx={{
-                                  '&:nth-of-type(odd)': { bgcolor: 'rgba(0, 0, 0, 0.02)' },
-                                  '&:hover': { bgcolor: 'rgba(0, 212, 255, 0.08)' }
-                                }}
-                              >
-                                <TableCell sx={{ 
-                                  fontFamily: 'monospace',
-                                  fontWeight: 600,
-                                  color: '#1976d2'
-                                }}>
-                                  {column.name}
-                                </TableCell>
-                                <TableCell>
+                      <AccordionDetails sx={{ p: 3 }}>
+                        {/* Table Metadata */}
+                        <Grid container spacing={3} sx={{ mb: 3 }}>
+                          <Grid item xs={12} md={6}>
+                            <Paper sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
+                              <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                                Primary Key
+                              </Typography>
+                              <Stack direction="row" spacing={1} flexWrap="wrap">
+                                {tableData.primary_key.map((key: string, index: number) => (
                                   <Chip
-                                    label={column.type}
+                                    key={index}
+                                    icon={<KeyIcon />}
+                                    label={key}
                                     size="small"
-                                    sx={{
-                                      bgcolor: `${getTypeColor(column.type)}15`,
-                                      color: getTypeColor(column.type),
-                                      fontWeight: 600
-                                    }}
+                                    sx={{ bgcolor: '#fff3cd', color: '#856404' }}
                                   />
-                                </TableCell>
-                                <TableCell sx={{ textAlign: 'center' }}>
-                                  <Badge
-                                    badgeContent={column.nullable ? "Yes" : "No"}
-                                    color={column.nullable ? "error" : "success"}
-                                    sx={{
-                                      '& .MuiBadge-badge': {
-                                        fontSize: '0.7rem',
-                                        fontWeight: 600,
-                                        minWidth: '40px',
-                                        height: '20px'
-                                      }
-                                    }}
+                                ))}
+                              </Stack>
+                            </Paper>
+                          </Grid>
+
+                          <Grid item xs={12} md={6}>
+                            <Paper sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
+                              <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                                Indexes
+                              </Typography>
+                              <Stack direction="row" spacing={1} flexWrap="wrap">
+                                {tableData.indexes.map((index: string, idx: number) => (
+                                  <Chip
+                                    key={idx}
+                                    icon={<SearchIcon />}
+                                    label={index}
+                                    size="small"
+                                    sx={{ bgcolor: '#d1ecf1', color: '#0c5460' }}
                                   />
-                                </TableCell>
+                                ))}
+                              </Stack>
+                            </Paper>
+                          </Grid>
+                        </Grid>
+
+                        {/* Columns Table */}
+                        <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+                          Column Structure
+                        </Typography>
+
+                        <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                          <Table>
+                            <TableHead>
+                              <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+                                <TableCell sx={{ fontWeight: 700, color: '#333' }}>Column Name</TableCell>
+                                <TableCell sx={{ fontWeight: 700, color: '#333' }}>Data Type</TableCell>
+                                <TableCell sx={{ fontWeight: 700, color: '#333', textAlign: 'center' }}>Nullable</TableCell>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </AccordionDetails>
-                  </Accordion>
-                </CardContent>
-              </Card>
+                            </TableHead>
+                            <TableBody>
+                              {tableData.columns.map((column: any, index: number) => (
+                                <TableRow
+                                  key={index}
+                                  hover
+                                  sx={{
+                                    '&:nth-of-type(odd)': { bgcolor: 'rgba(0, 0, 0, 0.02)' },
+                                    '&:hover': { bgcolor: 'rgba(0, 212, 255, 0.08)' }
+                                  }}
+                                >
+                                  <TableCell sx={{
+                                    fontFamily: 'monospace',
+                                    fontWeight: 600,
+                                    color: '#1976d2'
+                                  }}>
+                                    {column.name}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Chip
+                                      label={column.type}
+                                      size="small"
+                                      sx={{
+                                        bgcolor: `${getTypeColor(column.type)}15`,
+                                        color: getTypeColor(column.type),
+                                        fontWeight: 600
+                                      }}
+                                    />
+                                  </TableCell>
+                                  <TableCell sx={{ textAlign: 'center' }}>
+                                    <Badge
+                                      badgeContent={column.nullable ? "Yes" : "No"}
+                                      color={column.nullable ? "error" : "success"}
+                                      sx={{
+                                        '& .MuiBadge-badge': {
+                                          fontSize: '0.7rem',
+                                          fontWeight: 600,
+                                          minWidth: '40px',
+                                          height: '20px'
+                                        }
+                                      }}
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </AccordionDetails>
+                    </Accordion>
+                  </CardContent>
+                </Card>
               );
             })}
           </Stack>
@@ -602,10 +602,10 @@ const SeeTables: React.FC = () => {
       )}
 
       {/* SQL View Dialog */}
-      <Dialog 
-        open={sqlDialogOpen} 
-        onClose={() => setSqlDialogOpen(false)} 
-        maxWidth="md" 
+      <Dialog
+        open={sqlDialogOpen}
+        onClose={() => setSqlDialogOpen(false)}
+        maxWidth="md"
         fullWidth
       >
         <DialogTitle>
@@ -622,10 +622,10 @@ const SeeTables: React.FC = () => {
           </Stack>
         </DialogTitle>
         <DialogContent>
-          <Paper 
-            sx={{ 
-              p: 3, 
-              bgcolor: '#f8f9fa', 
+          <Paper
+            sx={{
+              p: 3,
+              bgcolor: '#f8f9fa',
               borderRadius: 2,
               border: '1px solid #e0e0e0',
               position: 'relative'
@@ -681,8 +681,8 @@ const SeeTables: React.FC = () => {
         autoHideDuration={6000}
         onClose={() => setNotification(prev => ({ ...prev, open: false }))}
       >
-        <Alert 
-          onClose={() => setNotification(prev => ({ ...prev, open: false }))} 
+        <Alert
+          onClose={() => setNotification(prev => ({ ...prev, open: false }))}
           severity={notification.severity}
           sx={{ width: '100%' }}
         >
