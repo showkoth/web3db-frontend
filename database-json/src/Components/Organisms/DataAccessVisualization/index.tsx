@@ -248,24 +248,6 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
           </Grid>
         </Grid>
 
-        {/* Information Banner */}
-        {isQueryExecuted && (
-          <Alert 
-            severity="info" 
-            sx={{ 
-              mt: 3, 
-              borderRadius: 2,
-              backgroundColor: 'rgba(0, 212, 255, 0.1)',
-              border: '1px solid rgba(0, 212, 255, 0.3)'
-            }}
-          >
-            <Typography variant="body2">
-              <strong>Access Control Active:</strong> Query returned {safeReturned.toLocaleString()} record(s).
-              Wallet policies grant access to {safeAccessible.toLocaleString()} of {safeTotal.toLocaleString()} total
-              ({accessPercentage.toFixed(1)}%).
-            </Typography>
-          </Alert>
-        )}
 
         {!isQueryExecuted && totalRows > 0 && (
           <Alert 
