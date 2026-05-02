@@ -47,7 +47,6 @@ import {
   ExpandMore as ExpandMoreIcon,
   Schedule as ScheduleIcon,
   DataObject as DataIcon,
-  Add as AddIcon,
   Delete as DeleteIcon,
   Save as SaveIcon,
   Cancel as CancelIcon,
@@ -62,7 +61,6 @@ const SeeTables: React.FC = () => {
   const { schemas, fetchSchemas, schemasLoading, error } = useContext(SqlContext);
 
   // State for schema management
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
@@ -70,88 +68,13 @@ const SeeTables: React.FC = () => {
     severity: 'success'
   });
 
-  // State for DDL input mode
-  const [isFormMode, setIsFormMode] = useState(true);
-  const [ddlInput, setDdlInput] = useState('');
 
   // State for SQL view dialog
   const [sqlDialogOpen, setSqlDialogOpen] = useState(false);
   const [selectedTableSql, setSelectedTableSql] = useState({ name: '', sql: '' });
   const [copySuccess, setCopySuccess] = useState(false);
 
-  // Example DDL templates
-  const ddlExamples = [
-    {
-      name: "Patient Data Table",
-      description: "Healthcare patient records",
-      ddl: `CREATE TABLE patient_data (
-  PatientID VARCHAR PRIMARY KEY,
-  Name VARCHAR NOT NULL,
-  Age INTEGER NOT NULL,
-  Gender VARCHAR,
-  BloodType VARCHAR,
-  Condition VARCHAR,
-  VisitDate VARCHAR,
-  Doctor VARCHAR,
-  HospitalID VARCHAR NOT NULL,
-  Prescription VARCHAR,
-  DiagnosisReport VARCHAR,
-  OwnerID VARCHAR NOT NULL
-);`
-    },
-    {
-      name: "User Profile Table",
-      description: "User management system",
-      ddl: `CREATE TABLE user_profiles (
-  UserID VARCHAR PRIMARY KEY,
-  Username VARCHAR,
-  Email VARCHAR,
-  FirstName VARCHAR,
-  LastName VARCHAR,
-  DateOfBirth DATE,
-  CreatedAt TIMESTAMP,
-  IsActive BOOLEAN,
-  ProfilePicture VARCHAR
-);`
-    },
-    {
-      name: "Transaction Records",
-      description: "Financial transaction data",
-      ddl: `CREATE TABLE transactions (
-  TransactionID VARCHAR PRIMARY KEY,
-  UserID VARCHAR,
-  Amount FLOAT,
-  Currency VARCHAR,
-  TransactionType VARCHAR,
-  Status VARCHAR,
-  Timestamp TIMESTAMP,
-  Description VARCHAR,
-  ReferenceID VARCHAR
-);`
-    },
-    {
-      name: "Event Logs",
-      description: "System event tracking",
-      ddl: `CREATE TABLE event_logs (
-  EventID VARCHAR PRIMARY KEY,
-  EventType VARCHAR,
-  UserID VARCHAR,
-  Timestamp TIMESTAMP,
-  IPAddress VARCHAR,
-  UserAgent VARCHAR,
-  EventData VARCHAR,
-  Severity VARCHAR
-);`
-    }
-  ];
 
-  // Form state for create/edit schema
-  const [schemaForm, setSchemaForm] = useState({
-    table_name: '',
-    columns: [{ name: '', type: 'string', nullable: false }],
-    primary_key: [''],
-    indexes: ['PatientID', 'HospitalID', 'Age']
-  });
 
   // Helper function to parse SQL CREATE TABLE statement into structured data
   const parseCreateTableSQL = (sql: string) => {
@@ -197,129 +120,8 @@ const SeeTables: React.FC = () => {
     }
   };
 
-  // Helper function to convert form data to SQL CREATE TABLE statement
-  const generateCreateTableSQL = (form: typeof schemaForm): string => {
-    const { table_name, columns, primary_key } = form;
-    
-    // Build column definitions
-    const columnDefs = columns.map(col => {
-      let def = `${col.name} `;
-      
-      // Map frontend types to SQL types
-      switch (col.type.toLowerCase()) {
-        case 'string':
-          def += 'VARCHAR';
-          break;
-        case 'integer':
-        case 'int':
-          def += 'INTEGER';
-          break;
-        case 'float':
-        case 'number':
-          def += 'FLOAT';
-          break;
-        case 'boolean':
-        case 'bool':
-          def += 'BOOLEAN';
-          break;
-        case 'date':
-          def += 'DATE';
-          break;
-        case 'datetime':
-        case 'timestamp':
-          def += 'TIMESTAMP';
-          break;
-        default:
-          def += 'VARCHAR';
-      }
-      
-      // Add PRIMARY KEY constraint for primary key columns
-      if (primary_key.includes(col.name)) {
-        def += ' PRIMARY KEY';
-      }
-      
-      return def;
-    }).join(', ');
-    
-    return `CREATE TABLE ${table_name} (${columnDefs})`;
-  };
 
-  // API functions for schema management
-  const createSchema = async () => {
-    setLoading(true);
-    try {
-      const schemaSql = generateCreateTableSQL(schemaForm);
-      
-      const response = await fetch(buildApiUrl('/schemas'), {
-        method: 'POST',
-        headers: config.REQUEST_CONFIG.HEADERS,
-        body: JSON.stringify({
-          table_name: schemaForm.table_name,
-          schema_sql: schemaSql
-        })
-      });
 
-      const data = await response.json();
-      if (data.status === 'success') {
-        setNotification({ open: true, message: 'Schema created successfully!', severity: 'success' });
-        setCreateDialogOpen(false);
-        fetchSchemas && fetchSchemas();
-        resetForm();
-      } else {
-        throw new Error(data.message || 'Failed to create schema');
-      }
-    } catch (err) {
-      setNotification({ 
-        open: true, 
-        message: err instanceof Error ? err.message : 'Failed to create schema', 
-        severity: 'error' 
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Create schema from DDL input
-  const createSchemaFromDDL = async () => {
-    setLoading(true);
-    try {
-      // Extract table name from DDL
-      const tableNameMatch = ddlInput.match(/CREATE\s+TABLE\s+(\w+)/i);
-      const tableName = tableNameMatch?.[1];
-      
-      if (!tableName) {
-        throw new Error('Could not extract table name from DDL. Please ensure your DDL starts with "CREATE TABLE table_name"');
-      }
-
-      const response = await fetch(buildApiUrl('/schemas'), {
-        method: 'POST',
-        headers: config.REQUEST_CONFIG.HEADERS,
-        body: JSON.stringify({
-          table_name: tableName,
-          schema_sql: ddlInput.trim()
-        })
-      });
-
-      const data = await response.json();
-      if (data.status === 'success') {
-        setNotification({ open: true, message: 'Schema created successfully from DDL!', severity: 'success' });
-        setCreateDialogOpen(false);
-        fetchSchemas && fetchSchemas();
-        resetForm();
-        setDdlInput('');
-      } else {
-        throw new Error(data.message || 'Failed to create schema from DDL');
-      }
-    } catch (err) {
-      setNotification({ 
-        open: true, 
-        message: err instanceof Error ? err.message : 'Failed to create schema from DDL', 
-        severity: 'error' 
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const deleteSchema = async (tableName: string) => {
     if (!window.confirm(`Are you sure you want to delete the schema for table "${tableName}"? This action cannot be undone.`)) {
@@ -351,16 +153,6 @@ const SeeTables: React.FC = () => {
     }
   };
 
-  const resetForm = () => {
-    setSchemaForm({
-      table_name: '',
-      columns: [{ name: '', type: 'string', nullable: false }],
-      primary_key: [''],
-      indexes: ['PatientID', 'HospitalID', 'Age']
-    });
-    setDdlInput('');
-    setIsFormMode(true);
-  };
 
   // Handle SQL dialog
   const handleViewSql = (tableName: string, sql: string) => {
@@ -387,33 +179,8 @@ const SeeTables: React.FC = () => {
     }
   };
 
-  const addColumn = () => {
-    setSchemaForm(prev => ({
-      ...prev,
-      columns: [...prev.columns, { name: '', type: 'string', nullable: false }]
-    }));
-  };
-
-  const removeColumn = (index: number) => {
-    setSchemaForm(prev => ({
-      ...prev,
-      columns: prev.columns.filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateColumn = (index: number, field: string, value: any) => {
-    setSchemaForm(prev => ({
-      ...prev,
-      columns: prev.columns.map((col, i) => 
-        i === index ? { ...col, [field]: value } : col
-      )
-    }));
-  };
 
   // Handle DDL example selection
-  const handleExampleSelect = (exampleDdl: string) => {
-    setDdlInput(exampleDdl);
-  };
 
   useEffect(() => {
     console.log("SeeTables component mounted, calling fetchSchemas");
@@ -482,18 +249,6 @@ const SeeTables: React.FC = () => {
           </Box>
           
           <Stack direction="row" spacing={2}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setCreateDialogOpen(true)}
-              sx={{
-                background: 'linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)',
-                textTransform: 'none',
-                fontWeight: 600
-              }}
-            >
-              Create Schema
-            </Button>
             <Tooltip title="Refresh Schemas">
               <IconButton 
                 onClick={handleRefresh} 
@@ -845,244 +600,6 @@ const SeeTables: React.FC = () => {
           </Stack>
         </Box>
       )}
-
-      {/* Create Schema Dialog */}
-      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <AddIcon sx={{ color: '#00D4FF' }} />
-            <Typography variant="h6" fontWeight={600}>Create New Table Schema</Typography>
-          </Stack>
-        </DialogTitle>
-        <DialogContent>
-          {/* Mode Selection Tabs */}
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 1 }}>
-            <Tabs value={isFormMode ? 0 : 1} onChange={(e, newValue) => setIsFormMode(newValue === 0)}>
-              <Tab label="Form Builder" />
-              <Tab label="SQL DDL" />
-            </Tabs>
-          </Box>
-          
-          {/* Form Mode */}
-          {isFormMode ? (
-            <Stack spacing={3} sx={{ mt: 2 }}>
-              <TextField
-                label="Table Name"
-                value={schemaForm.table_name}
-                onChange={(e) => setSchemaForm(prev => ({ ...prev, table_name: e.target.value }))}
-                placeholder="e.g., patient_data"
-                fullWidth
-                required
-              />
-              
-              <Box>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                  <Typography variant="h6" fontWeight={600}>Columns</Typography>
-                  <Button startIcon={<AddIcon />} onClick={addColumn} size="small">
-                    Add Column
-                  </Button>
-                </Stack>
-                
-                {schemaForm.columns.map((column, index) => (
-                  <Paper key={index} sx={{ p: 2, mb: 2, bgcolor: '#f8f9fa' }}>
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item xs={12} sm={4}>
-                        <TextField
-                          label="Column Name"
-                          value={column.name}
-                          onChange={(e) => updateColumn(index, 'name', e.target.value)}
-                          fullWidth
-                          size="small"
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={3}>
-                        <FormControl fullWidth size="small">
-                          <InputLabel>Data Type</InputLabel>
-                          <Select
-                            value={column.type}
-                            label="Data Type"
-                            onChange={(e) => updateColumn(index, 'type', e.target.value)}
-                          >
-                            <MenuItem value="string">String</MenuItem>
-                            <MenuItem value="integer">Integer</MenuItem>
-                            <MenuItem value="float">Float</MenuItem>
-                            <MenuItem value="boolean">Boolean</MenuItem>
-                            <MenuItem value="datetime">DateTime</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={12} sm={3}>
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={column.nullable}
-                              onChange={(e) => updateColumn(index, 'nullable', e.target.checked)}
-                            />
-                          }
-                          label="Nullable"
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={2}>
-                        <IconButton 
-                          onClick={() => removeColumn(index)}
-                          disabled={schemaForm.columns.length === 1}
-                          color="error"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Grid>
-                    </Grid>
-                  </Paper>
-                ))}
-              </Box>
-
-              <TextField
-                label="Primary Key (comma-separated)"
-                value={schemaForm.primary_key.join(', ')}
-                onChange={(e) => setSchemaForm(prev => ({ 
-                  ...prev, 
-                  primary_key: e.target.value.split(',').map(k => k.trim()).filter(k => k) 
-                }))}
-                placeholder="e.g., PatientID"
-                fullWidth
-                helperText="Enter column names that form the primary key"
-              />
-            </Stack>
-          ) : (
-            /* DDL Mode */
-            <Stack spacing={3} sx={{ mt: 2 }}>
-              <Alert severity="info">
-                Enter your SQL DDL (Data Definition Language) CREATE TABLE statement below. 
-                The table name will be automatically extracted from your DDL.
-              </Alert>
-
-              {/* Example Templates Section */}
-              <Paper sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>
-                  📋 Quick Start Templates
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Select a template to get started quickly:
-                </Typography>
-                <Grid container spacing={1}>
-                  {ddlExamples.map((example, index) => (
-                    <Grid item xs={12} sm={6} md={3} key={index}>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        onClick={() => handleExampleSelect(example.ddl)}
-                        sx={{
-                          textAlign: 'left',
-                          justifyContent: 'flex-start',
-                          textTransform: 'none',
-                          p: 1.5,
-                          height: 'auto',
-                          flexDirection: 'column',
-                          alignItems: 'flex-start',
-                          border: '1px solid #e0e0e0',
-                          '&:hover': {
-                            border: '1px solid #00D4FF',
-                            bgcolor: 'rgba(0, 212, 255, 0.04)'
-                          }
-                        }}
-                      >
-                        <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>
-                          {example.name}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {example.description}
-                        </Typography>
-                      </Button>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Paper>
-              
-              <TextField
-                label="SQL DDL Statement"
-                multiline
-                rows={12}
-                value={ddlInput}
-                onChange={(e) => setDdlInput(e.target.value)}
-                placeholder={`CREATE TABLE patient_data (
-  PatientID VARCHAR PRIMARY KEY,
-  Name VARCHAR,
-  Age INTEGER,
-  Gender VARCHAR,
-  BloodType VARCHAR,
-  Condition VARCHAR,
-  VisitDate VARCHAR,
-  Doctor VARCHAR,
-  HospitalID VARCHAR,
-  Prescription VARCHAR,
-  DiagnosisReport VARCHAR
-);`}
-                fullWidth
-                variant="outlined"
-                sx={{
-                  '& .MuiInputBase-input': {
-                    fontFamily: 'monospace',
-                    fontSize: '14px'
-                  }
-                }}
-                helperText="Write your CREATE TABLE statement or select a template above to get started."
-              />
-
-              {/* DDL Actions */}
-              {ddlInput && (
-                <Stack direction="row" spacing={2} justifyContent="flex-end">
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setDdlInput('')}
-                    startIcon={<CancelIcon />}
-                  >
-                    Clear
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => {
-                      const parsed = parseCreateTableSQL(ddlInput);
-                      if (parsed) {
-                        alert(`Preview:\n\nTable: ${ddlInput.match(/CREATE\s+TABLE\s+(\w+)/i)?.[1] || 'Unknown'}\nColumns: ${parsed.columns.length}\nPrimary Keys: ${parsed.primary_key.join(', ') || 'None'}`);
-                      } else {
-                        alert('Invalid DDL syntax. Please check your CREATE TABLE statement.');
-                      }
-                    }}
-                    startIcon={<CodeIcon />}
-                  >
-                    Preview
-                  </Button>
-                </Stack>
-              )}
-            </Stack>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => { setCreateDialogOpen(false); resetForm(); }} startIcon={<CancelIcon />}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={isFormMode ? createSchema : createSchemaFromDDL} 
-            variant="contained" 
-            startIcon={<SaveIcon />}
-            disabled={
-              loading || 
-              (isFormMode ? 
-                (!schemaForm.table_name || schemaForm.columns.some(col => !col.name)) :
-                !ddlInput.trim()
-              )
-            }
-            sx={{
-              background: 'linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)',
-            }}
-          >
-            {loading ? 'Creating...' : 'Create Schema'}
-          </Button>
-        </DialogActions>
-      </Dialog>
 
       {/* SQL View Dialog */}
       <Dialog 
