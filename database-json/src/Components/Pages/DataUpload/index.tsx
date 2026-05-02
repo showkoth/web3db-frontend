@@ -37,6 +37,7 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { config, buildApiUrl } from '../../../config/config';
+import { useWeb3 } from '../../../context/Web3Context';
 
 interface UploadResponse {
   data_cid?: string;
@@ -49,6 +50,7 @@ interface UploadResponse {
 }
 
 const DataUpload: React.FC = () => {
+  const { account } = useWeb3();
   const [uploadState, setUploadState] = useState<{
     isUploading: boolean;
     progress: number;
@@ -94,6 +96,15 @@ const DataUpload: React.FC = () => {
       return;
     }
 
+    const walletAddress = account || config.DEFAULT_WALLET_ADDRESS;
+    if (!walletAddress) {
+      setUploadState(prev => ({
+        ...prev,
+        error: 'Connect a wallet before uploading. Uploader wallet is recorded as data owner.',
+      }));
+      return;
+    }
+
     setUploadState({
       isUploading: true,
       progress: 0,
@@ -104,6 +115,7 @@ const DataUpload: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('wallet_address', walletAddress);
 
       // Create progress tracking
       const xhr = new XMLHttpRequest();
@@ -216,7 +228,7 @@ const DataUpload: React.FC = () => {
           Data Upload
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-          Upload patient data to Web3DB using CSV or SQL files. Data will be encrypted and stored on IPFS.
+          Upload patient data to Web3DB using CSV or SQL files. Data will be encrypted and stored on IPFS. Your connected wallet is recorded as the data owner — do not include an OwnerID column; it will be ignored.
         </Typography>
       </Box>
 
