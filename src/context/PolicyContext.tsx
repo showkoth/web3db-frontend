@@ -105,7 +105,7 @@ export const PolicyProvider: React.FC<PolicyProviderProps> = ({ children }) => {
       subject_address: "0x1A28b19f6d2ea1A05F9eFFbcCcbF7E9571877981", // Fixed data owner
       object_address: account,  // Current wallet gets access
       table_name: "patient_data",
-      policy_sql: "SELECT * FROM patient_data"
+      policy_sql: "SELECT * FROM patient_data WHERE Age > 90"
     };
 
     try {
