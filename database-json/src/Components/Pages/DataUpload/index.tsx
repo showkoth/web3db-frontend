@@ -87,7 +87,7 @@ const DataUpload: React.FC = () => {
     // Validate file type
     const fileName = file.name.toLowerCase();
     const fileExtension = fileName.split('.').pop();
-    
+
     if (!fileExtension || !['csv', 'sql'].includes(fileExtension)) {
       setUploadState(prev => ({
         ...prev,
@@ -119,7 +119,7 @@ const DataUpload: React.FC = () => {
 
       // Create progress tracking
       const xhr = new XMLHttpRequest();
-      
+
       xhr.upload.addEventListener('progress', (e) => {
         if (e.lengthComputable) {
           const progressPercent = (e.loaded / e.total) * 100;
@@ -149,7 +149,7 @@ const DataUpload: React.FC = () => {
         };
 
         xhr.open('POST', buildApiUrl(`/upload/${tableName}`));
-        
+
         // Add headers from config if needed
         Object.entries(config.REQUEST_CONFIG.HEADERS).forEach(([key, value]) => {
           if (key !== 'Content-Type') { // Let browser set Content-Type for FormData
@@ -213,11 +213,11 @@ const DataUpload: React.FC = () => {
     <Box sx={{ p: 4, minHeight: '100vh', bgcolor: '#f8f9fa' }}>
       {/* Header Section */}
       <Box sx={{ mb: 4 }}>
-        <Typography 
-          variant="h3" 
-          fontWeight={700} 
-          sx={{ 
-            mb: 2, 
+        <Typography
+          variant="h3"
+          fontWeight={700}
+          sx={{
+            mb: 2,
             color: '#1a1a1a',
             display: 'flex',
             alignItems: 'center',
@@ -228,7 +228,7 @@ const DataUpload: React.FC = () => {
           Data Upload
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-          Upload patient data to Web3DB using CSV or SQL files. Data will be encrypted and stored on IPFS. Your connected wallet is recorded as the data owner — do not include an OwnerID column; it will be ignored.
+          Upload patient data to Web3DB using CSV or SQL files. Data will be encrypted and stored on IPFS.
         </Typography>
       </Box>
 
@@ -255,8 +255,8 @@ const DataUpload: React.FC = () => {
                       tableName.length === 0
                         ? 'Required. Letters, numbers, underscores; cannot start with a number.'
                         : !isValidTableName
-                        ? 'Invalid name. Use letters, numbers, underscores; cannot start with a number.'
-                        : 'Will POST to /upload/' + tableName
+                          ? 'Invalid name. Use letters, numbers, underscores; cannot start with a number.'
+                          : 'Will POST to /upload/' + tableName
                     }
                     sx={{ mb: 3 }}
                   />
@@ -310,8 +310,8 @@ const DataUpload: React.FC = () => {
                     Uploading Data...
                   </Typography>
                   <Box sx={{ width: '100%', mb: 2 }}>
-                    <LinearProgress 
-                      variant="determinate" 
+                    <LinearProgress
+                      variant="determinate"
                       value={uploadState.progress}
                       sx={{
                         height: 8,
@@ -490,8 +490,8 @@ const DataUpload: React.FC = () => {
       </Grid>
 
       {/* Details Dialog */}
-      <Dialog 
-        open={detailsDialogOpen} 
+      <Dialog
+        open={detailsDialogOpen}
         onClose={() => setDetailsDialogOpen(false)}
         maxWidth="md"
         fullWidth
