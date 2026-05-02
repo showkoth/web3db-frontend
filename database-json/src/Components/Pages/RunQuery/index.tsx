@@ -55,13 +55,13 @@ const RunQuery: React.FC = () => {
     error: sqlError,
     accessibleCount,
   } = useContext(SqlContext);
-  
-  const { isConnected, account } = useWeb3();
-  
+
+  const { isConnected } = useWeb3();
+
   const [inputQuery, setInputQuery] = useState<string>("SELECT * FROM patient_data WHERE PatientID = '323'");
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Pagination state
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -146,7 +146,7 @@ const RunQuery: React.FC = () => {
   const renderTable = () => {
     if (results && results.length > 0) {
       const columns = Object.keys(results[0]);
-      
+
       return (
         <Paper sx={{ width: '100%', mb: 2, borderRadius: 2, overflow: 'hidden' }}>
           <TableContainer>
@@ -316,11 +316,11 @@ const RunQuery: React.FC = () => {
     <Box sx={{ p: 4, minHeight: '100vh', bgcolor: '#f8f9fa' }}>
       {/* Header Section */}
       <Box sx={{ mb: 4 }}>
-        <Typography 
-          variant="h3" 
-          fontWeight={700} 
-          sx={{ 
-            mb: 2, 
+        <Typography
+          variant="h3"
+          fontWeight={700}
+          sx={{
+            mb: 2,
             color: '#1a1a1a',
             display: 'flex',
             alignItems: 'center',
@@ -331,35 +331,14 @@ const RunQuery: React.FC = () => {
           Universal SQL Interface
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Execute SQL queries on the Web3DB decentralized database with your connected wallet.
+          Execute SQL queries on the Web3DB with your wallet.
         </Typography>
 
         {/* Wallet Status */}
-        {isConnected ? (
-          <Alert 
-            severity="success" 
-            sx={{ 
-              borderRadius: 2,
-              backgroundColor: 'rgba(76, 175, 80, 0.1)',
-              border: '1px solid rgba(76, 175, 80, 0.3)',
-              mb: 3
-            }}
-          >
-            <Stack direction="row" alignItems="center" spacing={2}>
-              <Box>
-                <Typography variant="body1" fontWeight={600}>
-                  🟢 Wallet Connected
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {account?.slice(0, 8)}...{account?.slice(-6)}
-                </Typography>
-              </Box>
-            </Stack>
-          </Alert>
-        ) : (
-          <Alert 
+        {!isConnected && (
+          <Alert
             severity="warning"
-            sx={{ 
+            sx={{
               borderRadius: 2,
               backgroundColor: 'rgba(255, 193, 7, 0.1)',
               border: '1px solid rgba(255, 193, 7, 0.3)',
@@ -377,7 +356,7 @@ const RunQuery: React.FC = () => {
 
         {/* Policy Status - Show only when connected */}
         {isConnected && <PolicyStatus />}
-        
+
         {/* Data Access Visualization */}
         {isConnected && (
           <DataAccessVisualization
@@ -473,8 +452,8 @@ const RunQuery: React.FC = () => {
                   variant="outlined"
                   startIcon={<ExportIcon />}
                   disabled={!results || results.length === 0}
-                  sx={{ 
-                    borderColor: '#00D4FF', 
+                  sx={{
+                    borderColor: '#00D4FF',
                     color: '#00D4FF',
                     textTransform: 'none',
                     '&:hover': {
@@ -498,13 +477,13 @@ const RunQuery: React.FC = () => {
                 <HistoryIcon sx={{ color: '#4CAF50' }} />
                 Example Queries
               </Typography>
-              
+
               <Stack spacing={2}>
                 {exampleQueries.map((example, index) => (
-                  <Card 
+                  <Card
                     key={index}
                     variant="outlined"
-                    sx={{ 
+                    sx={{
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                       '&:hover': {
@@ -524,7 +503,7 @@ const RunQuery: React.FC = () => {
                       <Chip
                         label={example.query.length > 40 ? `${example.query.substring(0, 40)}...` : example.query}
                         size="small"
-                        sx={{ 
+                        sx={{
                           fontFamily: 'monospace',
                           backgroundColor: 'rgba(0, 212, 255, 0.1)',
                           color: '#0088CC'
@@ -550,10 +529,10 @@ const RunQuery: React.FC = () => {
           )}
 
           {sqlError && (
-            <Alert 
-              severity="error" 
-              sx={{ 
-                borderRadius: 2, 
+            <Alert
+              severity="error"
+              sx={{
+                borderRadius: 2,
                 mb: 3,
                 backgroundColor: 'rgba(255, 87, 87, 0.1)',
                 border: '1px solid rgba(255, 87, 87, 0.3)'
