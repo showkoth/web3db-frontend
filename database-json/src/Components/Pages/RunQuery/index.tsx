@@ -29,7 +29,6 @@ import {
   History as HistoryIcon,
   Help as HelpIcon,
   Storage as DatabaseIcon,
-  Speed as OptimizeIcon,
 } from "@mui/icons-material";
 import AceEditor from "react-ace";
 import "brace/mode/sql";
@@ -60,7 +59,6 @@ const RunQuery: React.FC = () => {
   const { isConnected, account } = useWeb3();
   
   const [inputQuery, setInputQuery] = useState<string>("SELECT * FROM patient_data WHERE PatientID = '323'");
-  const [indexAttribute, setIndexAttribute] = useState<string>("PatientID");
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -71,10 +69,6 @@ const RunQuery: React.FC = () => {
   const handleInputChange = (newValue: string) => {
     const transformedValue = capitalizeSQLKeywords(newValue);
     setInputQuery(transformedValue);
-  };
-
-  const handleIndexAttributeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIndexAttribute(event.target.value);
   };
 
   const handleChangePage = (_event: unknown, newPage: number) => {
@@ -98,11 +92,6 @@ const RunQuery: React.FC = () => {
       return;
     }
 
-    if (!indexAttribute.trim()) {
-      alert("Please enter an index attribute");
-      return;
-    }
-
     // Reset pagination when running a new query
     setPage(0);
     setIsLoading(true);
@@ -110,7 +99,7 @@ const RunQuery: React.FC = () => {
     try {
       // Check if runQuery is defined
       if (runQuery) {
-        await runQuery(inputQuery, indexAttribute);
+        await runQuery(inputQuery);
       } else {
         console.error("runQuery function is undefined");
       }
@@ -448,20 +437,6 @@ const RunQuery: React.FC = () => {
                   placeholder="Enter your SQL query here..."
                 />
               </Box>
-
-              {/* Index Attribute */}
-              <TextField
-                fullWidth
-                label="Index Attribute"
-                value={indexAttribute}
-                onChange={handleIndexAttributeChange}
-                helperText="Index attribute for query optimization (e.g., PatientID)"
-                variant="outlined"
-                sx={{ mb: 3 }}
-                InputProps={{
-                  startAdornment: <OptimizeIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                }}
-              />
 
               {/* Action Buttons */}
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>

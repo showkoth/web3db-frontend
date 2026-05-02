@@ -6,7 +6,7 @@ import { useWeb3 } from "./Web3Context";
 type SqlState = {
   query: string;
   results: any;
-  runQuery: (query: string, indexAttribute: string) => void;
+  runQuery: (query: string) => void;
   message: string | null;
   error: string | null;
   schemas: any;
@@ -45,10 +45,7 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
   // Get wallet address from Web3Context
   const { account } = useWeb3();
 
-  const runQuery = async (
-    sqlQuery: string,
-    indexAttribute: string
-  ) => {
+  const runQuery = async (sqlQuery: string) => {
     setQuery(sqlQuery);
     setMessage(null);
     setError(null);
@@ -56,7 +53,6 @@ export const SqlProvider: React.FC<SqlProviderProps> = ({ children }) => {
     setAccessibleCount(null);
 
     const requestBody = {
-      index_attribute: indexAttribute,
       query: sqlQuery,
       wallet_address: account || config.DEFAULT_WALLET_ADDRESS,
     };
