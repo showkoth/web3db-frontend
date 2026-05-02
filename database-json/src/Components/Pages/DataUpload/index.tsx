@@ -234,7 +234,7 @@ const DataUpload: React.FC = () => {
 
       {/* Upload Area */}
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12}>
           <Card sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
             <CardContent sx={{ p: 4 }}>
               {!uploadState.result && !uploadState.error && (
@@ -431,59 +431,6 @@ const DataUpload: React.FC = () => {
                   </Button>
                 </Box>
               )}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Information Panel */}
-        <Grid item xs={12} md={4}>
-          <Card sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                📋 Supported File Formats
-              </Typography>
-              <Stack spacing={2}>
-                <Box>
-                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                    <TableIcon sx={{ color: '#4CAF50', fontSize: 20 }} />
-                    <Typography variant="body2" fontWeight={600}>CSV Files (.csv)</Typography>
-                  </Stack>
-                  <Typography variant="caption" color="text.secondary">
-                    Comma-separated values with headers. Automatically detects columns (e.g., PatientID, HospitalID, and Age).
-                  </Typography>
-                </Box>
-                <Box>
-                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                    <DatabaseIcon sx={{ color: '#2196F3', fontSize: 20 }} />
-                    <Typography variant="body2" fontWeight={600}>SQL Files (.sql)</Typography>
-                  </Stack>
-                  <Typography variant="caption" color="text.secondary">
-                    SQL INSERT statements or data dumps. Processed and converted to structured format.
-                  </Typography>
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
-
-          <Card sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                🔒 Security & Privacy
-              </Typography>
-              <Stack spacing={1}>
-                <Typography variant="body2" color="text.secondary">
-                  • Data is encrypted before IPFS storage
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  • Automatic index generation for fast queries
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  • Decentralized storage with content addressing
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  • Smart contract integration for metadata
-                </Typography>
-              </Stack>
             </CardContent>
           </Card>
         </Grid>
