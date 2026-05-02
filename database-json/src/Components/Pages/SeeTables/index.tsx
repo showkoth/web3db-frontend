@@ -52,6 +52,7 @@ import {
   Cancel as CancelIcon,
   Code as CodeIcon,
   ContentCopy as CopyIcon,
+  People as PeopleIcon,
 } from "@mui/icons-material";
 import { SqlContext } from "../../../context/SqlContext";
 import { config, buildApiUrl } from "../../../config/config";
@@ -73,6 +74,9 @@ const SeeTables: React.FC = () => {
   const [sqlDialogOpen, setSqlDialogOpen] = useState(false);
   const [selectedTableSql, setSelectedTableSql] = useState({ name: '', sql: '' });
   const [copySuccess, setCopySuccess] = useState(false);
+
+  // Per-table owner counts (multi-tenant), keyed by table name
+  const [ownerCounts, setOwnerCounts] = useState<Record<string, number>>({});
 
 
 
@@ -191,6 +195,32 @@ const SeeTables: React.FC = () => {
       console.log("fetchSchemas is not available");
     }
   }, [fetchSchemas]);
+
+  // Fetch per-table owner counts whenever schema list changes
+  useEffect(() => {
+    if (!schemas) return;
+    const tableNames = Object.keys(schemas);
+    if (tableNames.length === 0) return;
+
+    let cancelled = false;
+    Promise.all(
+      tableNames.map(async (name) => {
+        try {
+          const res = await fetch(buildApiUrl(`/tables/${encodeURIComponent(name)}/owner-count`), {
+            headers: { 'Accept': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+          });
+          if (!res.ok) return [name, 0] as const;
+          const data = await res.json();
+          return [name, typeof data.owner_count === 'number' ? data.owner_count : 0] as const;
+        } catch {
+          return [name, 0] as const;
+        }
+      })
+    ).then((entries) => {
+      if (!cancelled) setOwnerCounts(Object.fromEntries(entries));
+    });
+    return () => { cancelled = true; };
+  }, [schemas]);
 
   console.log("SeeTables render - schemasLoading:", schemasLoading, "error:", error, "schemas:", schemas);
 
@@ -448,6 +478,12 @@ const SeeTables: React.FC = () => {
                                 label={`Primary: ${tableData.primary_key?.join(', ') || 'None'}`}
                                 size="small"
                                 sx={{ bgcolor: 'rgba(255, 152, 0, 0.1)', color: '#FF9800' }}
+                              />
+                              <Chip
+                                icon={<PeopleIcon />}
+                                label={`${ownerCounts[tableName] ?? 0} owners`}
+                                size="small"
+                                sx={{ bgcolor: 'rgba(156, 39, 176, 0.1)', color: '#9C27B0' }}
                               />
                             </Stack>
                           </Box>
