@@ -27,6 +27,8 @@ interface DataAccessVisualizationProps {
   /** Rows wallet's policies grant access to (independent of query) */
   accessibleCount?: number | null;
   isQueryExecuted?: boolean;
+  /** Table to count total rows for. Defaults to backend default. */
+  tableName?: string;
 }
 
 interface TotalDataResponse {
@@ -40,19 +42,22 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
   returnedCount = 0,
   accessibleCount = null,
   isQueryExecuted = false,
+  tableName,
 }) => {
   const [totalRows, setTotalRows] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasFetched, setHasFetched] = useState<boolean>(false);
 
   const fetchTotalRowCount = async () => {
     setLoading(true);
     setError(null);
 
     try {
+      const url = tableName
+        ? buildApiUrl(`/query/count?table_name=${encodeURIComponent(tableName)}`)
+        : buildApiUrl('/query/count');
       const response = await fetch(
-        buildApiUrl('/query/count'),
+        url,
         {
           method: 'GET',
           headers: {
@@ -68,7 +73,6 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
 
       const data: TotalDataResponse = await response.json();
       setTotalRows(data.total_rows);
-      setHasFetched(true);
     } catch (err) {
       console.error('Error fetching total row count:', err);
       if (err instanceof Error) {
@@ -82,10 +86,9 @@ const DataAccessVisualization: React.FC<DataAccessVisualizationProps> = ({
   };
 
   useEffect(() => {
-    if (!hasFetched) {
-      fetchTotalRowCount();
-    }
-  }, [hasFetched]);
+    fetchTotalRowCount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tableName]);
 
   const safeTotal = totalRows || 0;
   const safeAccessible = accessibleCount ?? 0;

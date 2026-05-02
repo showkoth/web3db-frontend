@@ -395,6 +395,7 @@ const RunQuery: React.FC = () => {
             returnedCount={results ? results.length : 0}
             accessibleCount={accessibleCount ?? null}
             isQueryExecuted={results !== null}
+            tableName={inputQuery.match(/FROM\s+([A-Za-z_][A-Za-z0-9_]*)/i)?.[1]}
           />
         )}
       </Box>
