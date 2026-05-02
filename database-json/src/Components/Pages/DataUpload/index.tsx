@@ -228,7 +228,7 @@ const DataUpload: React.FC = () => {
           Data Upload
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-          Upload patient data to Web3DB using CSV or SQL files. Data will be encrypted and stored on IPFS.
+          Upload data to Web3DB. Data will be encrypted and stored on IPFS.
         </Typography>
       </Box>
 
