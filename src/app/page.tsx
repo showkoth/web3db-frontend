@@ -175,12 +175,32 @@ function PersonCard({ person }: { person: Person }) {
 
 export default function HomePage() {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="dark flex min-h-dvh flex-col bg-background text-foreground">
       <header className="flex h-14 items-center justify-between border-b px-6">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <Database className="h-5 w-5" />
-          web3db
-        </Link>
+        <div className="flex items-center gap-10">
+          <Link
+            href="/"
+            className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400 bg-clip-text font-mono text-lg font-extrabold tracking-[0.2rem] text-transparent"
+          >
+            WEB3DB
+          </Link>
+          <nav className="hidden items-center gap-6 text-sm font-semibold uppercase tracking-wider text-foreground/90 md:flex">
+            <Link href="/" className="transition-colors hover:text-cyan-400">
+              Home
+            </Link>
+            <Link href="/query" className="transition-colors hover:text-cyan-400">
+              Demo
+            </Link>
+            <a
+              href="https://docs.web3db.org/docs/intro"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors hover:text-cyan-400"
+            >
+              Documentation
+            </a>
+          </nav>
+        </div>
         <Button render={<Link href="/query" />} size="sm">
           Open App
         </Button>
@@ -189,7 +209,7 @@ export default function HomePage() {
       <main className="flex-1">
         <section className="relative overflow-hidden">
           <HeroBackground />
-          <div className="mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-center gap-6 px-6 py-24 md:items-start md:py-32 md:text-left">
+          <div className="relative z-10 mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-center gap-6 px-6 py-24 md:items-start md:py-32 md:text-left">
             <h1 className="font-mono text-5xl font-extrabold tracking-[0.4rem] sm:text-6xl md:text-7xl">
               <span className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,212,255,0.5)]">
                 WEB3DB.ORG
