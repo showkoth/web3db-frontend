@@ -128,3 +128,33 @@
     @apply font-sans;
   }
 }
+
+@keyframes blob-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(60px, -40px) scale(1.1); }
+  66% { transform: translate(-40px, 30px) scale(0.95); }
+}
+@keyframes blob-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-50px, 50px) scale(0.9); }
+  66% { transform: translate(40px, -30px) scale(1.05); }
+}
+@keyframes blob-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -50px) scale(1.1); }
+}
+
+.animate-blob-slow { animation: blob-drift-1 18s ease-in-out infinite; }
+.animate-blob-slower { animation: blob-drift-2 24s ease-in-out infinite; }
+.animate-blob-slowest { animation: blob-drift-3 30s ease-in-out infinite; }
+
+@keyframes node-pulse {
+  0%, 100% { r: 0.4; opacity: 0.6; }
+  50% { r: 0.7; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blob-slow, .animate-blob-slower, .animate-blob-slowest, circle {
+    animation: none !important;
+  }
+}

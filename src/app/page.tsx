@@ -9,10 +9,8 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { SplineHero } from '@/components/spline-hero';
+import { HeroBackground } from '@/components/hero-background';
 import { Button } from '@/components/ui/button';
-
-const SPLINE_SCENE = 'https://prod.spline.design/G-ZkNll36P6FOfVW/scene.splinecode';
 
 export const metadata: Metadata = {
   title: 'web3db — Decentralized SQL with on-chain access policies',
@@ -190,10 +188,7 @@ export default function HomePage() {
 
       <main className="flex-1">
         <section className="relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 hidden md:block">
-            <SplineHero scene={SPLINE_SCENE} />
-          </div>
-          <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(ellipse_at_top,theme(colors.foreground/8%),transparent_60%)] md:hidden" />
+          <HeroBackground />
           <div className="mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-center gap-6 px-6 py-24 md:items-start md:py-32 md:text-left">
             <h1 className="font-mono text-5xl font-extrabold tracking-[0.4rem] sm:text-6xl md:text-7xl">
               <span className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,212,255,0.5)]">
@@ -204,9 +199,9 @@ export default function HomePage() {
               Decentralized Zero-Trust Computing and Storage
             </h2>
             <p className="max-w-3xl text-pretty text-xl leading-relaxed text-foreground/80 sm:text-2xl">
-              Web3DB restores data ownership to individuals — fine-grained access control,
-              secure query processing, and safe sharing. Built on blockchain, IPFS, and trusted
-              execution environments (TEEs). Anyone can join and contribute.
+              Web3DB restores data ownership to individuals. It provides fine-grained access
+              control, secure query processing, and data sharing. Built on blockchain, IPFS, and
+              trusted execution environments (TEEs). Anyone can join and contribute.
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-4">
               <Button
