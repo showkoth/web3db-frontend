@@ -1,0 +1,50 @@
+{
+  "properties": {
+    "total": { "type": "integer", "title": "Total" },
+    "page": { "type": "integer", "title": "Page" },
+    "page_size": { "type": "integer", "title": "Page Size" },
+    "logs": {
+      "items": {
+        "properties": {
+          "log_id": { "type": "string", "title": "Log Id" },
+          "timestamp": { "type": "string", "title": "Timestamp" },
+          "action": { "type": "string", "title": "Action" },
+          "api_endpoint": { "type": "string", "title": "Api Endpoint" },
+          "status": { "type": "string", "title": "Status" },
+          "wallet_address": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Wallet Address"
+          },
+          "target_table": {
+            "anyOf": [{ "items": { "type": "string" }, "type": "array" }, { "type": "null" }],
+            "title": "Target Table"
+          },
+          "query": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Query" },
+          "details": {
+            "anyOf": [{ "additionalProperties": true, "type": "object" }, { "type": "null" }],
+            "title": "Details"
+          },
+          "ip_address": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Ip Address"
+          },
+          "blockchain_log_id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Blockchain Log Id"
+          },
+          "sk2": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Sk2" }
+        },
+        "type": "object",
+        "required": ["log_id", "timestamp", "action", "api_endpoint", "status"],
+        "title": "LogEntry",
+        "x-readme-ref-name": "LogEntry"
+      },
+      "type": "array",
+      "title": "Logs"
+    }
+  },
+  "type": "object",
+  "required": ["total", "page", "page_size", "logs"],
+  "title": "PaginatedLogs",
+  "x-readme-ref-name": "PaginatedLogs"
+}

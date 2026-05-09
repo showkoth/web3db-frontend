@@ -39,3 +39,23 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+*storybook.log
+storybook-static
+
+# serwist / pwa build output
+/public/sw.js
+/public/sw.js.map
+/public/swe-worker-*.js
+/public/workbox-*.js
+
+# playwright
+/test-results
+/playwright-report
+/playwright/.cache
+
+# local AI assistant config (per-dev)
+AGENTS.md
+CLAUDE.md
+.claude/
+.cursor/

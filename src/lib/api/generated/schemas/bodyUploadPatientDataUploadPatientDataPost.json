@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "file": { "type": "string", "contentMediaType": "application/octet-stream", "title": "File" },
+    "wallet_address": { "type": "string", "title": "Wallet Address" }
+  },
+  "type": "object",
+  "required": ["file", "wallet_address"],
+  "title": "Body_upload_patient_data_upload_patient_data_post",
+  "x-readme-ref-name": "Body_upload_patient_data_upload_patient_data_post"
+}

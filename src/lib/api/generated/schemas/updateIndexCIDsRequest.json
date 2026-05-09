@@ -1,0 +1,9 @@
+{
+  "properties": {
+    "index_cids": { "additionalProperties": true, "type": "object", "title": "Index Cids" }
+  },
+  "type": "object",
+  "required": ["index_cids"],
+  "title": "UpdateIndexCIDsRequest",
+  "x-readme-ref-name": "UpdateIndexCIDsRequest"
+}

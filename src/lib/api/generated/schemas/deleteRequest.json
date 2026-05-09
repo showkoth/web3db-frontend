@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "delete_query": { "type": "string", "title": "Delete Query" },
+    "wallet_address": { "type": "string", "title": "Wallet Address" }
+  },
+  "type": "object",
+  "required": ["delete_query", "wallet_address"],
+  "title": "DeleteRequest",
+  "x-readme-ref-name": "DeleteRequest"
+}

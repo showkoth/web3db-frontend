@@ -1,0 +1,19 @@
+{
+  "properties": {
+    "table_name": { "type": "string", "title": "Table Name", "default": "patient_data" },
+    "index_attribute": {
+      "anyOf": [{ "type": "string" }, { "type": "null" }],
+      "title": "Index Attribute"
+    },
+    "query": {
+      "type": "string",
+      "title": "Query",
+      "default": "select * from patient_data where PatientID = 'X'"
+    },
+    "wallet_address": { "type": "string", "title": "Wallet Address" }
+  },
+  "type": "object",
+  "required": ["wallet_address"],
+  "title": "QueryRequest",
+  "x-readme-ref-name": "QueryRequest"
+}

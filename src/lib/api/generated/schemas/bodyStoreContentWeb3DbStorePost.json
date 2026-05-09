@@ -1,0 +1,9 @@
+{
+  "properties": {
+    "file": { "type": "string", "contentMediaType": "application/octet-stream", "title": "File" }
+  },
+  "type": "object",
+  "required": ["file"],
+  "title": "Body_store_content_web3db_store_post",
+  "x-readme-ref-name": "Body_store_content_web3db_store_post"
+}

@@ -1,0 +1,22 @@
+{
+  "properties": {
+    "metricId": { "type": "integer", "title": "Metricid" },
+    "unitCode": { "type": "string", "title": "Unitcode" },
+    "totalValue": { "anyOf": [{ "type": "number" }, { "type": "null" }], "title": "Totalvalue" },
+    "avgValue": { "anyOf": [{ "type": "number" }, { "type": "null" }], "title": "Avgvalue" },
+    "minValue": { "anyOf": [{ "type": "number" }, { "type": "null" }], "title": "Minvalue" },
+    "maxValue": { "anyOf": [{ "type": "number" }, { "type": "null" }], "title": "Maxvalue" },
+    "samplesCount": {
+      "anyOf": [{ "type": "integer" }, { "type": "null" }],
+      "title": "Samplescount"
+    },
+    "computedJson": {
+      "anyOf": [{ "additionalProperties": true, "type": "object" }, { "type": "null" }],
+      "title": "Computedjson"
+    }
+  },
+  "type": "object",
+  "required": ["metricId", "unitCode"],
+  "title": "SegmentMetricItem",
+  "x-readme-ref-name": "SegmentMetricItem"
+}

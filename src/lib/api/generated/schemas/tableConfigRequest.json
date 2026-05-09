@@ -1,0 +1,14 @@
+{
+  "properties": {
+    "table_name": { "type": "string", "title": "Table Name" },
+    "indexed_attributes": {
+      "items": { "type": "string" },
+      "type": "array",
+      "title": "Indexed Attributes"
+    }
+  },
+  "type": "object",
+  "required": ["table_name", "indexed_attributes"],
+  "title": "TableConfigRequest",
+  "x-readme-ref-name": "TableConfigRequest"
+}

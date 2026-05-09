@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "table_name": { "type": "string", "title": "Table Name" },
+    "schema_sql": { "type": "string", "title": "Schema Sql" }
+  },
+  "type": "object",
+  "required": ["table_name", "schema_sql"],
+  "title": "UpdateTableSchemaRequest",
+  "x-readme-ref-name": "UpdateTableSchemaRequest"
+}

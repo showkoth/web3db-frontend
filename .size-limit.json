@@ -1,0 +1,8 @@
+[
+  {
+    "name": "Landing page (/)",
+    "path": ".next/static/chunks/!(*pages)*.js",
+    "limit": "250 KB",
+    "gzip": true
+  }
+]

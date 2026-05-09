@@ -1,0 +1,12 @@
+{
+  "properties": {
+    "subject_address": { "type": "string", "title": "Subject Address" },
+    "object_address": { "type": "string", "title": "Object Address" },
+    "table_name": { "type": "string", "title": "Table Name" },
+    "policy_sql": { "type": "string", "title": "Policy Sql" }
+  },
+  "type": "object",
+  "required": ["subject_address", "object_address", "table_name", "policy_sql"],
+  "title": "AddAccessPolicyRequest",
+  "x-readme-ref-name": "AddAccessPolicyRequest"
+}

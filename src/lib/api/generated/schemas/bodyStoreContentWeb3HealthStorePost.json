@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "segment_id": { "type": "string", "title": "Segment Id" },
+    "file": { "type": "string", "contentMediaType": "application/octet-stream", "title": "File" }
+  },
+  "type": "object",
+  "required": ["segment_id", "file"],
+  "title": "Body_store_content_web3health_store_post",
+  "x-readme-ref-name": "Body_store_content_web3health_store_post"
+}

@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "object_address": { "type": "string", "title": "Object Address" },
+    "policy_index": { "type": "integer", "title": "Policy Index" }
+  },
+  "type": "object",
+  "required": ["object_address", "policy_index"],
+  "title": "RemoveAccessPolicyRequest",
+  "x-readme-ref-name": "RemoveAccessPolicyRequest"
+}

@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "update_query": { "type": "string", "title": "Update Query" },
+    "wallet_address": { "type": "string", "title": "Wallet Address" }
+  },
+  "type": "object",
+  "required": ["update_query", "wallet_address"],
+  "title": "UpdateRequest",
+  "x-readme-ref-name": "UpdateRequest"
+}
